@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="HamRenderer\Renderer.cpp" />
+    <ClCompile Include="HamEvent\Event.cpp" />
+    <ClCompile Include="HamData\Tileset.cpp" />
+    <ClCompile Include="HamRenderer\TexManager.cpp" />
+    <ClCompile Include="HamGame\HamCraft.cpp" />
+    <ClCompile Include="HamGame\TileMap.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Common\Assert.h" />
+    <ClInclude Include="Common\Common.h" />
+    <ClInclude Include="Common\Memory.hpp" />
+    <ClInclude Include="HamRenderer\Renderer.h" />
+    <ClInclude Include="HamRenderer\RenderOption.h" />
+    <ClInclude Include="HamEvent\Event.h" />
+    <ClInclude Include="HamData\Tileset.h" />
+    <ClInclude Include="HamRenderer\TexManager.h" />
+    <ClInclude Include="HamGame\HamCraft.h" />
+    <ClInclude Include="HamGame\TileMap.h" />
+  </ItemGroup>
+</Project>
