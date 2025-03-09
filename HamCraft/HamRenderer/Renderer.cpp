@@ -24,8 +24,8 @@ bool Renderer::Initialize()
 	}
 
 	mRenderer = SDL_CreateRenderer(mWindow, -1, SDL_RENDERER_ACCELERATED);
-	
-	if (!mTexManager.Initialize(&mRenderer))
+
+	if (!mTexManager.Initialize(mRenderer))
 	{
 		std::cout << "TextureManager Initialization Fail";
 		return false;
@@ -68,12 +68,12 @@ void Renderer::DrawTileMap(int tileMap[][16])
 	{
 		for (int x = 0; x < 16; x++)
 		{
-			SDL_Texture* tex;
+			SDL_Texture* tex = nullptr;
 			SDL_Rect srcRect;
 			int idx = tileMap[y][x];
 			if (idx > 0)
 			{
-				mTexManager.GetTileTex(&tex, &srcRect, "terr_1", int((idx - 1) / 16), idx - 1);
+				//mTexManager.GetTileTex(&tex, &srcRect, "terr_1", int((idx - 1) / 16), idx - 1);
 
 				SDL_Rect dstRect = { centerX + tileMapPivX * tileSize + x * tileSize, centerY + tileMapPivY * tileSize + y * tileSize, tileSize, tileSize };
 				SDL_RenderCopy(mRenderer, tex, &srcRect, &dstRect);
@@ -85,7 +85,7 @@ void Renderer::DrawTileMap(int tileMap[][16])
 // Protected
 bool Renderer::initSDL()
 {
-	if (SDL_Init(SDL_INIT_VIDEO) < 0) 
+	if (SDL_Init(SDL_INIT_VIDEO) < 0)
 	{
 		std::cout << "SDL Initialization Fail:\n" << SDL_GetError();
 		return false;
@@ -96,7 +96,7 @@ bool Renderer::initSDL()
 		SDL_WINDOWPOS_UNDEFINED,
 		static_cast<int>(mRenderOption.Resolution.Width), static_cast<int>(mRenderOption.Resolution.Height),
 		SDL_WINDOW_SHOWN);
-	if (!mWindow) 
+	if (!mWindow)
 	{
 		std::cout << "SDL Initialization Fail:\n" << SDL_GetError();
 		SDL_Quit();

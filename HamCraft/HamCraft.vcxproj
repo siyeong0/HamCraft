@@ -128,13 +128,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="HamGame\Space\ChunkManager.cpp" />
+    <ClCompile Include="HamData\Texture.cpp" />
     <ClCompile Include="HamGame\HamCraft.cpp" />
+    <ClCompile Include="HamGame\Space\Chunk.cpp" />
     <ClCompile Include="HamRenderer\Renderer.cpp" />
     <ClCompile Include="HamData\Tileset.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="HamEvent\Event.cpp" />
     <ClCompile Include="HamRenderer\TexManager.cpp" />
-    <ClCompile Include="HamGame\TileMap.cpp" />
+    <ClCompile Include="HamGame\Space\World.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\Assert.h" />
@@ -143,10 +146,14 @@
     <ClInclude Include="HamGame\HamCraft.h" />
     <ClInclude Include="HamData\Tileset.h" />
     <ClInclude Include="HamEvent\Event.h" />
-    <ClInclude Include="HamGame\TileMap.h" />
+    <ClInclude Include="HamGame\Space\Cell.h" />
+    <ClInclude Include="HamGame\Space\World.h" />
     <ClInclude Include="HamRenderer\Renderer.h" />
     <ClInclude Include="HamRenderer\RenderOption.h" />
     <ClInclude Include="HamRenderer\TexManager.h" />
+    <ClInclude Include="HamData\Texture.h" />
+    <ClInclude Include="HamGame\Space\Chunk.h" />
+    <ClInclude Include="HamGame\Space\ChunkManager.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
