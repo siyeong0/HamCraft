@@ -142,11 +142,12 @@
   <ItemGroup>
     <ClInclude Include="Common\Assert.h" />
     <ClInclude Include="Common\Common.h" />
+    <ClInclude Include="Common\Math.h" />
     <ClInclude Include="Common\Memory.hpp" />
     <ClInclude Include="HamGame\HamCraft.h" />
     <ClInclude Include="HamData\Tileset.h" />
     <ClInclude Include="HamEvent\Event.h" />
-    <ClInclude Include="HamGame\Space\Cell.h" />
+    <ClInclude Include="HamGame\Space\Block.h" />
     <ClInclude Include="HamGame\Space\World.h" />
     <ClInclude Include="HamRenderer\Renderer.h" />
     <ClInclude Include="HamRenderer\RenderOption.h" />

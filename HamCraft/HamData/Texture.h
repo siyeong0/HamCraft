@@ -4,20 +4,24 @@
 
 #include "../Common/Common.h"
 
-using TEXTURE_ID_TYPE = int;
-
-class Texture
+namespace ham
 {
-public:
-	Texture();
-	~Texture();
+	using TEXTURE_ID_TYPE = int;
 
-	bool Load(const char* path);
-	bool Load(const std::string& path);
-	void Free();
+	class Texture
+	{
+	public:
+		Texture();
+		~Texture();
 
-	SDL_Surface* GetSDLSurface() { ASSERT(mSDLSurface != nullptr);  return mSDLSurface; };
+		bool Load(const char* path);
+		bool Load(const std::string& path);
+		void Free();
 
-private:
-	SDL_Surface* mSDLSurface;
-};
+		SDL_Surface* GetSDLSurface() { ASSERT(mSDLSurface != nullptr);  return mSDLSurface; };
+
+	private:
+		SDL_Surface* mSDLSurface;
+	};
+
+}

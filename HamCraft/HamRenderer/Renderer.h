@@ -5,27 +5,30 @@
 #include "TexManager.h"
 #include "RenderOption.h"
 
-class Renderer
+namespace ham
 {
-public:
-	Renderer();
-	virtual ~Renderer();
+	class Renderer
+	{
+	public:
+		Renderer();
+		virtual ~Renderer();
 
-	bool Initialize();
-	void Update(float dt);
-	void Render();
-	void Finalize();
+		bool Initialize();
+		void Update(float dt);
+		void Render();
+		void Finalize();
 
-	void DrawTileMap(int tileMap[][16]);
+		void DrawTileMap(int tileMap[][16]);
 
-protected:
-	virtual bool initSDL();
+	protected:
+		virtual bool initSDL();
 
-protected:
-	SDL_Window* mWindow;
-	SDL_Renderer* mRenderer;
+	protected:
+		SDL_Window* mWindow;
+		SDL_Renderer* mRenderer;
 
-	TexManager mTexManager;
+		TexManager mTexManager;
 
-	RenderOption mRenderOption;
-};
+		RenderOption mRenderOption;
+	};
+}

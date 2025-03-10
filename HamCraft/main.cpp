@@ -4,8 +4,11 @@
 
 #undef main
 
+using namespace ham;
+
 int main(void)
 {	
+
 	HamCraft game;
 	game.Initialize();
 

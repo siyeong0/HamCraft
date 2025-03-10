@@ -8,64 +8,67 @@
 // 대응되는 Free 잘 사용할것. 모르겠으면 Commom/Memory.h ㄱㄱ
 
 // 그래프 노드
-struct ChunkManager::Node
+namespace ham
 {
-	Chunk* Data;
-	Node* Childs[4];
-};
+	struct ChunkManager::Node
+	{
+		Chunk* Data;
+		Node* Childs[4];
+	};
 
-// 청크 탐색할 때 위 아래 양옆 방향을 나타냄
-enum class ChunkManager::EDirection
-{
-	// NSWE?
-};
+	// 청크 탐색할 때 위 아래 양옆 방향을 나타냄
+	enum class ChunkManager::EDirection
+	{
+		// NSWE?
+	};
 
-// 생성자. 초기화 잘할것
-ChunkManager::ChunkManager(float manageDist)
-	: mCurrRoot(nullptr)
-	, mManageDistance(manageDist)
-	, mCapacity(-1)
-	, mSize(-1)
-{
+	// 생성자. 초기화 잘할것
+	ChunkManager::ChunkManager()
+		: mCurrRoot(nullptr)
+		, mManageDistance(0)
+		, mCapacity(-1)
+		, mSize(-1)
+	{
 
-}
+	}
 
-// 파괴자. 메모리 누수 없는지 확인
-ChunkManager::~ChunkManager()
-{
-	
-}
+	// 파괴자. 메모리 누수 없는지 확인
+	ChunkManager::~ChunkManager()
+	{
 
-// 현재 루트에서 eDir 방향으로 루트를 옮김
-void ChunkManager::UpdateRoot(EDirection eDir)
-{
+	}
 
-}
+	// 현재 루트에서 eDir 방향으로 루트를 옮김
+	void ChunkManager::UpdateRoot(EDirection eDir)
+	{
 
-// 거리 내에 있는 청크를 벡터로 반환
-// reserve 잊지 말것
-// RVO위해 return은 chunkArr로만
-std::vector<Chunk*> ChunkManager::GetChunksInCircleDist(float dist)
-{
-	std::vector<Chunk*> chunkArr;
+	}
 
-	return chunkArr;
-}
+	// 거리 내에 있는 청크를 벡터로 반환
+	// reserve 잊지 말것
+	// RVO위해 return은 chunkArr로만
+	std::vector<Chunk*> ChunkManager::GetChunksInCircleDist(float dist)
+	{
+		std::vector<Chunk*> chunkArr;
 
-std::vector<Chunk*> ChunkManager::GetChunksInRectDist(float distX, float distY)
-{
-	std::vector<Chunk*> chunkArr;
+		return chunkArr;
+	}
 
-	return chunkArr;
-}
+	std::vector<Chunk*> ChunkManager::GetChunksInRectDist(float distX, float distY)
+	{
+		std::vector<Chunk*> chunkArr;
 
-void ChunkManager::Reserve(size_t size)
-{
+		return chunkArr;
+	}
 
-}
+	void ChunkManager::Reserve(size_t size)
+	{
 
-// 거리 밖의 청크 삭제
-void ChunkManager::freeChunksOutDist()
-{
+	}
 
+	// 거리 밖의 청크 삭제
+	void ChunkManager::freeChunksOutDist()
+	{
+
+	}
 }

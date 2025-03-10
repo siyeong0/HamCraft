@@ -8,7 +8,9 @@
     <ClCompile Include="HamRenderer\TexManager.cpp" />
     <ClCompile Include="HamGame\HamCraft.cpp" />
     <ClCompile Include="HamData\Texture.cpp" />
-    <ClCompile Include="HamGame\Space\MapChunk.cpp" />
+    <ClCompile Include="HamGame\Space\ChunkManager.cpp" />
+    <ClCompile Include="HamGame\Space\Chunk.cpp" />
+    <ClCompile Include="HamGame\Space\World.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\Assert.h" />
@@ -21,7 +23,10 @@
     <ClInclude Include="HamRenderer\TexManager.h" />
     <ClInclude Include="HamGame\HamCraft.h" />
     <ClInclude Include="HamData\Texture.h" />
-    <ClInclude Include="HamGame\Space\MapChunk.h" />
-    <ClInclude Include="HamGame\Space\Cell.h" />
+    <ClInclude Include="HamGame\Space\Block.h" />
+    <ClInclude Include="HamGame\Space\World.h" />
+    <ClInclude Include="HamGame\Space\Chunk.h" />
+    <ClInclude Include="HamGame\Space\ChunkManager.h" />
+    <ClInclude Include="Common\Math.h" />
   </ItemGroup>
 </Project>

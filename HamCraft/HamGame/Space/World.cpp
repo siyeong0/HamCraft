@@ -1,27 +1,30 @@
 #include "World.h"
 
-World::World()
+namespace ham
 {
+	World::World()
+	{
 
-}
+	}
 
-World::~World()
-{
+	World::~World()
+	{
 
-}
+	}
 
-bool World::Initialize()
-{
-	mChunkArr.reserve(DEFAULT_RESERVE_SIZE);
-	return true;
-}
+	bool World::Initialize()
+	{
 
-void World::Finalize()
-{
+		return true;
+	}
 
-}
+	void World::Finalize()
+	{
 
-void World::Update(float dt)
-{
+	}
 
+	void World::Update(float dt)
+	{
+
+	}
 }

@@ -3,20 +3,24 @@
 
 #include "../../Common/Common.h"
 #include "Chunk.h"
+#include "ChunkManager.h"
 
-class World
+namespace ham
 {
-public:
-	World();
-	~World();
+	class World
+	{
+	public:
+		World();
+		~World();
 
-	bool Initialize();
-	void Finalize();
+		bool Initialize();
+		void Finalize();
 
-	void Update(float dt);
+		void Update(float dt);
 
-private:
-	std::vector<Chunk*> mChunkArr;
-
-	static constexpr size_t DEFAULT_RESERVE_SIZE = 64;
-};
+	private:
+		ChunkManager mChunkManager;
+		Vec2 mUserPos;
+		static constexpr size_t DEFAULT_RESERVE_SIZE = 64;
+	};
+}

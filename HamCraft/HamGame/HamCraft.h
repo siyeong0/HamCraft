@@ -3,17 +3,20 @@
 #include "../HamRenderer/Renderer.h"
 #include "../HamEvent/Event.h"
 
-class HamCraft
+namespace ham
 {
-public:
-	HamCraft();
-	~HamCraft();
+	class HamCraft
+	{
+	public:
+		HamCraft();
+		~HamCraft();
 
-	bool Initialize();
-	void Run();
-	void Finalize();
+		bool Initialize();
+		void Run();
+		void Finalize();
 
-private:
-	Renderer mRenderer;
-	Event mEvent;
-};
+	private:
+		Renderer mRenderer;
+		Event mEvent;
+	};
+}

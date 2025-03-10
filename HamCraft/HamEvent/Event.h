@@ -3,18 +3,19 @@
 
 #include"../Common/Common.h"
 
-
-
-class Event
+namespace ham
 {
-public:
-	Event();
-	virtual ~Event();
+	class Event
+	{
+	public:
+		Event();
+		virtual ~Event();
 
-	bool Initialize();
-	void Update(float dt);
-	void Finalize();
+		bool Initialize();
+		void Update(float dt);
+		void Finalize();
 
-protected:
-	SDL_Event mEvent;
-};
+	protected:
+		SDL_Event mEvent;
+	};
+}
