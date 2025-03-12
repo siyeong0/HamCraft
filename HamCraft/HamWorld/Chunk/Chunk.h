@@ -2,7 +2,7 @@
 
 #include "../../Common/Common.h"
 #include "../../HamObject/IGameObject.h"
-#include "CellMap.h"
+#include "../CellMap/CellMap.h"
 
 namespace ham
 {

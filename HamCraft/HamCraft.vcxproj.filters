@@ -27,13 +27,13 @@
     <ClCompile Include="HamGame\HamCraft.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="HamGame\World\CellMap.cpp">
+    <ClCompile Include="HamWorld\CellMap\CellMap.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="HamGame\World\Chunk.cpp">
+    <ClCompile Include="HamWorld\Chunk\Chunk.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="HamGame\World\ChunkManager.cpp">
+    <ClCompile Include="HamWorld\Chunk\ChunkManager.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="HamEvent\Event.cpp">
@@ -68,16 +68,16 @@
     <ClInclude Include="HamGame\HamCraft.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="HamGame\World\Cell.h">
+    <ClInclude Include="HamWorld\CellMap\Cell.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="HamGame\World\CellMap.h">
+    <ClInclude Include="HamWorld\CellMap\CellMap.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="HamGame\World\Chunk.h">
+    <ClInclude Include="HamWorld\Chunk\Chunk.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="HamGame\World\ChunkManager.h">
+    <ClInclude Include="HamWorld\Chunk\ChunkManager.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="HamEvent\Event.h">

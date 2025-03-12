@@ -3,7 +3,7 @@
 #include "../Common/Common.h"
 #include "../HamRenderer/Renderer.h"
 #include "../HamEvent/Event.h"
-#include "World/ChunkManager.h"
+#include "../HamWorld/Chunk/ChunkManager.h"
 
 namespace ham
 {
