@@ -24,8 +24,6 @@ namespace ham
 	private:
 		CellMap mCellMap;
 		PerlinNoise mPerlinNoise;
-
-		Vec2i mIdx;
 	};
 
 	inline Cell& Chunk::Map(const Vec2i& idx)
