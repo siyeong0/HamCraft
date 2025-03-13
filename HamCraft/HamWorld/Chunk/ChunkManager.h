@@ -11,7 +11,7 @@ namespace ham
 	class ChunkManager
 	{
 	public:
-		static constexpr Vec2i MANAGE_CHUNK_DEPTH = { 1, 1 };
+		static constexpr Vec2i MANAGE_CHUNK_DEPTH = { 2, 2 };
 		static constexpr int WIDTH = 1 + 2 * MANAGE_CHUNK_DEPTH.X; // 루트와 직교하는 청크 1, 양옆/위아래로 Depth만큼
 		static constexpr int HEIGHT = 1 + 2 * MANAGE_CHUNK_DEPTH.Y;
 		static constexpr int NUM_CHUNKS = WIDTH * HEIGHT;
@@ -29,7 +29,7 @@ namespace ham
 		void Finalize();
 
 		void Update(float dt);
-		
+
 		// TODO: std::vector 대신 Custom Vector 사용
 		std::vector<std::pair<Chunk*, Vec2i>> GetIntersectChunks(const Rect& rt) const;
 		Cell& GetCell(const Vec2i& pos);
@@ -48,13 +48,17 @@ namespace ham
 	};
 
 	// private
+
 	inline Vec2i ChunkManager::calcChunkOffset(const Vec2i& pos) const
 	{
-		Vec2i halfSize = CHUNK_PX_SIZE / 2;
 		static_assert(CHUNK_PX_SIZE.X % 2 == 0 && CHUNK_PX_SIZE.Y % 2 == 0, "CHUNK_SIZE must be even number");
+		float halfSizeX = static_cast<float>(CHUNK_PX_SIZE.X / 2);
+		float halfSizeY = static_cast<float>(CHUNK_PX_SIZE.Y / 2);
+		
+		// TODO: int 로 변환해도 괜찮은지
 		return Vec2i{
-			(pos.X / halfSize.X + 1) / 2,
-			(pos.Y / halfSize.Y + 1) / 2
+			static_cast<int>(std::floor((static_cast<float>(pos.X) + halfSizeX) / static_cast<float>(CHUNK_PX_SIZE.X))),
+			static_cast<int>(std::floor((static_cast<float>(pos.Y) + halfSizeY) / static_cast<float>(CHUNK_PX_SIZE.Y)))
 		};
 	}
 

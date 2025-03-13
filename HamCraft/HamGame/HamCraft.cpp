@@ -39,6 +39,7 @@ namespace ham
 		while (!quit)
 		{
 			mRenderer.Update(0.16f);
+			mChunkManager.Update(0.16f);
 			mEvent.Update(0.16f);
 
 			const Rect rtRect = mRenderer.GetRTPos();
@@ -62,7 +63,6 @@ namespace ham
 		{
 			Chunk* chunk = chunkTup.first;
 			Vec2i chunkPos = chunkTup.second;
-			CellMap& cellMap = chunk->mCellMap;
 
 			Rect chunkRect = { chunkPos.X, chunkPos.Y, ChunkManager::CHUNK_PX_SIZE.X, ChunkManager::CHUNK_PX_SIZE.Y };
 			ASSERT(mRenderer.GetRTPos().DoIntersect(chunkRect));
@@ -81,7 +81,7 @@ namespace ham
 			{
 				for (int x = 0; x < numCells.X; ++x)
 				{
-					Cell& cell = cellMap[Vec2i{ startLocalIdx.X + x, startLocalIdx.Y + y }];
+					Cell& cell = chunk->Map(Vec2i{ startLocalIdx.X + x, startLocalIdx.Y + y });
 					Vec2i cellPos = cellBasePos + Vec2i{ x,y } * CELL_PX_SIZE;
 
 					const Cell& up = mChunkManager.GetCell(cellPos + Vec2i{ 0, CELL_PX_SIZE });

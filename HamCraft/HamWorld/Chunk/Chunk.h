@@ -19,10 +19,17 @@ namespace ham
 
 		void Load(const Vec2i& idx);
 
+		inline Cell& Map(const Vec2i& idx);
+
+	private:
 		CellMap mCellMap;
 		PerlinNoise mPerlinNoise;
-	//private:
-	//	// TODO: 오브젝트 리스트로 변경
-	//	CellMap* mCellMap;
+
+		Vec2i mIdx;
 	};
+
+	inline Cell& Chunk::Map(const Vec2i& idx)
+	{
+		return mCellMap[idx];
+	}
 }

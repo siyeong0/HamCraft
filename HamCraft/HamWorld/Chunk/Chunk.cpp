@@ -5,6 +5,7 @@ namespace ham
 	Chunk::Chunk()
 		: mCellMap()
 		, mPerlinNoise(103, PerlinNoise::EInterp::Cosine, 1, 1, 2)
+		, mIdx({ 0,0 })
 	{
 
 	}
@@ -30,6 +31,7 @@ namespace ham
 
 	void Chunk::Load(const Vec2i& idx)
 	{
+		mIdx = idx;
 		// TODO: 파일에서 로드
 		// 디버그용 초기화
 		const float HEIGHT_SCALE = 1.5f;

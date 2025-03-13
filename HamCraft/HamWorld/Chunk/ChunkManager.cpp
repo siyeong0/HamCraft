@@ -47,7 +47,6 @@ namespace ham
 			}
 		}
 
-
 		return true;
 	}
 
@@ -86,24 +85,46 @@ namespace ham
 		ASSERT(std::abs(diffOffset.X) < WIDTH && std::abs(diffOffset.Y) < HEIGHT);
 
 		// 오프셋 만큼 청크 교체
+		bool isVisited[NUM_CHUNKS] = { 0 };
 		const Vec2i baseOffset = prevCenterOffset - Vec2i{ WIDTH / 2, HEIGHT / 2 };
 		for (int y = 0; y < std::abs(diffOffset.Y); ++y)
 		{
-			for (int x = 0; x < std::abs(diffOffset.X); ++x)
+			for (int x = 0; x < WIDTH; ++x)
 			{
-				int repX = diffOffset.X > 0 ? x : WIDTH - (x + 1);
-				int repY = diffOffset.Y > 0 ? x : HEIGHT - (y + 1);
+				int repY = diffOffset.Y > 0 ? y : HEIGHT - (y + 1);
 				// TODO: 캐시에 저장, 로드
 				// 청크 해제
-				CHUNK_MAP(repX, repY)->Finalize();
-				Free<Chunk>(CHUNK_MAP(repX, repY));
+				CHUNK_MAP(x, repY)->Finalize();
+				Free<Chunk>(CHUNK_MAP(x, repY));
 				// 청크 할당
-				CHUNK_MAP(repX, repY) = Alloc<Chunk>();
-				CHUNK_MAP(repX, repY)->Initialize();
-				CHUNK_MAP(x, y)->Load(baseOffset + Vec2i{ x, y });
+				CHUNK_MAP(x, repY) = Alloc<Chunk>();
+				CHUNK_MAP(x, repY)->Initialize();
+				CHUNK_MAP(x, repY)->Load(baseOffset + Vec2i{ x, y });
+
+				isVisited[y * WIDTH + x] = true;
 			}
 		}
-		
+
+		for (int x = 0; x < std::abs(diffOffset.X); ++x)
+		{
+			for (int y = 0; y < HEIGHT; ++y)
+			{
+				if (isVisited[y * WIDTH + x])
+					continue;
+				int repX = diffOffset.X > 0 ? x : WIDTH - (x + 1);
+				// TODO: 캐시에 저장, 로드
+				// 청크 해제
+				CHUNK_MAP(repX, y)->Finalize();
+				Free<Chunk>(CHUNK_MAP(repX, y));
+				// 청크 할당
+				CHUNK_MAP(repX, y) = Alloc<Chunk>();
+				CHUNK_MAP(repX, y)->Initialize();
+				CHUNK_MAP(repX, y)->Load(baseOffset + Vec2i{ x, y });
+
+				isVisited[y * WIDTH + x] = true;
+			}
+		}
+
 		// 인덱스 테이블 갱신
 		int idxTableBuf[NUM_CHUNKS];
 		std::iota(idxTableBuf, idxTableBuf + NUM_CHUNKS, 0);	// 0,1,2,3,4...로 초기화
@@ -116,7 +137,7 @@ namespace ham
 				idxTableBuf[movedY * WIDTH + movedX] = mIdxTable[y * WIDTH + x];
 			}
 		}
-		std::copy(mIdxTable, mIdxTable + NUM_CHUNKS, idxTableBuf);
+		std::copy(idxTableBuf, idxTableBuf + NUM_CHUNKS, mIdxTable);
 	}
 
 	std::vector<std::pair<Chunk*, Vec2i>> ChunkManager::GetIntersectChunks(const Rect& rt) const
@@ -130,11 +151,11 @@ namespace ham
 		{
 			for (int x = 0; x < WIDTH; ++x)
 			{
-				Rect chunkRect = calcChunkRect(baseOffset + Vec2i{x,y});
+				Rect chunkRect = calcChunkRect(baseOffset + Vec2i{ x,y });
 				if (chunkRect.DoIntersect(rt))
 				{
 					outChunks.push_back(std::make_pair(
-						CHUNK_MAP(x, y), 
+						CHUNK_MAP(x, y),
 						Vec2i{ chunkRect.X, chunkRect.Y }
 					));
 				}
@@ -153,6 +174,6 @@ namespace ham
 		Chunk* targetChunk = CHUNK_MAP(targetIdx.X, targetIdx.Y);
 
 		Vec2i localPos = pos - cvtOffset2BasePos(targetChunkOffset);
-		return targetChunk->mCellMap[localPos / CELL_PX_SIZE];
+		return targetChunk->Map(localPos / CELL_PX_SIZE);
 	}
 }
