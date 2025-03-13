@@ -63,6 +63,9 @@
     <ClCompile Include="HamWorld\CellMap\Cell.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="HamWorld\Tile\Tile.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="HamRenderer\Camera.h">
@@ -104,9 +107,6 @@
     <ClInclude Include="Common\Common.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="Common\Path.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="Common\Math\Math.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
@@ -129,6 +129,15 @@
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="HamWorld\CellMap\Cell.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="HamWorld\Tile\Tile.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="HamWorld\SizeInfo.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\Types.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>

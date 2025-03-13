@@ -106,6 +106,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <DisableSpecificWarnings>26819;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -144,6 +145,7 @@
     <ClCompile Include="HamRenderer\Renderer.cpp" />
     <ClCompile Include="HamRenderer\TexManager.cpp" />
     <ClCompile Include="HamWorld\MapGeneration\MapGenerator.cpp" />
+    <ClCompile Include="HamWorld\Tile\Tile.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -155,7 +157,7 @@
     <ClInclude Include="Common\Math\Vec2.hpp" />
     <ClInclude Include="Common\Math\Vec2i.hpp" />
     <ClInclude Include="Common\Memory\Memory.hpp" />
-    <ClInclude Include="Common\Path.h" />
+    <ClInclude Include="Common\Types.h" />
     <ClInclude Include="HamContainer\FixedQueue.hpp" />
     <ClInclude Include="HamData\Tileset.h" />
     <ClInclude Include="HamEvent\Event.h" />
@@ -169,6 +171,8 @@
     <ClInclude Include="HamRenderer\Renderer.h" />
     <ClInclude Include="HamRenderer\TexManager.h" />
     <ClInclude Include="HamWorld\MapGeneration\MapGenerator.h" />
+    <ClInclude Include="HamWorld\SizeInfo.h" />
+    <ClInclude Include="HamWorld\Tile\Tile.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

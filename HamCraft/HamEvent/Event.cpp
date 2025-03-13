@@ -34,16 +34,16 @@ namespace ham
 			switch (mEvent.key.keysym.sym)
 			{
 			case SDLK_w:
-				gDbgPos.Y += static_cast<int>(10 * dt);
+				gDbgPos.Y += static_cast<int>(100 * dt);
 				break;;
 			case SDLK_a:
-				gDbgPos.X += static_cast<int>(-10 * dt);
+				gDbgPos.X += static_cast<int>(-100 * dt);
 				break;
 			case SDLK_s:
-				gDbgPos.Y += static_cast<int>(-10 * dt);
+				gDbgPos.Y += static_cast<int>(-100 * dt);
 				break;
 			case SDLK_d:
-				gDbgPos.X += static_cast<int>(10 * dt);
+				gDbgPos.X += static_cast<int>(100 * dt);
 				break;
 			}
 			break;

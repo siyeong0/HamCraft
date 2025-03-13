@@ -19,7 +19,7 @@ namespace ham
 
 		void Load(const Vec2i& idx);
 
-		CellMap* mCellMap;
+		CellMap mCellMap;
 		PerlinNoise mPerlinNoise;
 	//private:
 	//	// TODO: 오브젝트 리스트로 변경

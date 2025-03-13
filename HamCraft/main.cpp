@@ -1,6 +1,7 @@
 #include <iostream>
 #include "Common/Common.h"
 #include "HamGame/HamCraft.h"
+#include "Common/Types.h"
 
 #undef main
 

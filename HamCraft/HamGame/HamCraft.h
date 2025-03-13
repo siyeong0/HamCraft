@@ -14,8 +14,11 @@ namespace ham
 		~HamCraft();
 
 		bool Initialize();
-		void Run();
 		void Finalize();
+		void Run();
+
+	private:
+		void drawTiles(const std::vector<std::pair<Chunk*, Vec2i>>& targetChunks);
 
 	private:
 		Renderer mRenderer;

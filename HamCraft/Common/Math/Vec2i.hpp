@@ -42,6 +42,11 @@ namespace ham
 		return Vec2i{ lhs.X / rhs, lhs.Y / rhs };
 	}
 
+	inline Vec2i operator%(const Vec2i& lhs, int rhs)
+	{
+		return Vec2i{ lhs.X % rhs, lhs.Y % rhs };
+	}
+
 	inline Vec2i operator-(const Vec2i& rhs) 
 	{
 		return -1 * rhs;

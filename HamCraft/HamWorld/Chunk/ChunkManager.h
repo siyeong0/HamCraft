@@ -11,7 +11,7 @@ namespace ham
 	class ChunkManager
 	{
 	public:
-		static constexpr Vec2i MANAGE_CHUNK_DEPTH = { 4, 2 };
+		static constexpr Vec2i MANAGE_CHUNK_DEPTH = { 1, 1 };
 		static constexpr int WIDTH = 1 + 2 * MANAGE_CHUNK_DEPTH.X; // 루트와 직교하는 청크 1, 양옆/위아래로 Depth만큼
 		static constexpr int HEIGHT = 1 + 2 * MANAGE_CHUNK_DEPTH.Y;
 		static constexpr int NUM_CHUNKS = WIDTH * HEIGHT;
@@ -32,10 +32,14 @@ namespace ham
 		
 		// TODO: std::vector 대신 Custom Vector 사용
 		std::vector<std::pair<Chunk*, Vec2i>> GetIntersectChunks(const Rect& rt) const;
+		Cell& GetCell(const Vec2i& pos);
 
 	private:
 		inline Vec2i calcChunkOffset(const Vec2i& pos) const;
 		inline Rect calcChunkRect(const Vec2i& offset) const;
+		inline Vec2i getCurrCenterOffset();
+		inline Vec2i getBaseChunkOffset();
+		inline Vec2i cvtOffset2BasePos(const Vec2i& offset) const;
 	private:
 		Chunk** mChunkMap;
 		int* mIdxTable;	// 노드 인덱스 테이블
@@ -59,5 +63,21 @@ namespace ham
 		Vec2i halfSize = CHUNK_PX_SIZE / 2;
 		Vec2i start = -halfSize + offset * CHUNK_PX_SIZE;
 		return Rect{ start.X, start.Y, CHUNK_PX_SIZE.X, CHUNK_PX_SIZE.Y };
+	}
+
+	inline Vec2i ChunkManager::getCurrCenterOffset()
+	{
+		return calcChunkOffset(mCurrUserPos);
+	}
+
+	inline Vec2i ChunkManager::getBaseChunkOffset()
+	{
+		return calcChunkOffset(mCurrUserPos) - Vec2i{ WIDTH / 2, HEIGHT / 2 };
+	}
+
+	inline Vec2i ChunkManager::cvtOffset2BasePos(const Vec2i& offset) const
+	{
+		Vec2i halfSize = CHUNK_PX_SIZE / 2;
+		return -halfSize + CHUNK_PX_SIZE * offset;
 	}
 }

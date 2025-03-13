@@ -35,19 +35,4 @@ namespace ham
 	{
 
 	}
-
-	void CellMap::Draw(SDL_Renderer* sdlRenderTarget, const Vec2i& startPos)
-	{
-		ASSERT(mCells != nullptr);
-		for (int y = 0; y < HEIGHT; ++y)
-		{
-			for (int x = 0; x < WIDTH; ++x)
-			{
-				const Cell& cell = mCells[y * WIDTH + x];
-
-				if (cell != EMPTY_CELL)
-					cell.Draw(sdlRenderTarget, startPos + Vec2i{ x, y } *CELL_PX_SIZE);
-			}
-		}
-	}
 }

@@ -21,7 +21,6 @@ namespace ham
 		bool Initilize();
 		void Finalize();
 		void Update(float dt);
-		void Draw(SDL_Renderer* sdlRenderTarget, const Vec2i& startPos);
 
 		inline const Cell& GetCell(const Vec2i& idx);
 		inline Cell& operator[](const Vec2i& idx);
@@ -44,6 +43,7 @@ namespace ham
 
 	inline void CellMap::Clear()
 	{
-		std::fill(mCells, mCells + NUM_CELLS, EMPTY_CELL);
+		std::memset(mCells, 0, sizeof(Cell) * NUM_CELLS);
+		//std::fill(mCells, mCells + NUM_CELLS, 0);
 	}
 }

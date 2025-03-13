@@ -1,14 +1,14 @@
 #pragma once
 #include <iostream>
 #include <unordered_map>
+#include <cstdint>
+
 #include <SDL2/SDL.h>
 
 #include"../Common/Common.h"
 
 namespace ham
 {
-	using TEXTURE_ID_TYPE = int;
-
 	class TexManager;
 	extern "C" TexManager* GetTexManager();
 

@@ -1,32 +1,47 @@
 #pragma once
 #include "../../Common/Common.h"
-#include "../../HamRenderer/Renderer.h"
-#include "../../HamRenderer/TexManager.h"
+#include "../SizeInfo.h"
+#include "../Tile/Tile.h"
 
 namespace ham
 {
-	static constexpr int CELL_PX_SIZE = 16;
-
 	class Cell
 	{
 	public:
-		TEXTURE_ID_TYPE TexId;
+		Tile ForeTile;
+		Tile RearTile;
 	public:
 		Cell();
-		Cell(TEXTURE_ID_TYPE id);
+		Cell(TILE_ID_TYPE foreTileId, TILE_ID_TYPE rearTileId);
 
-		void Draw(SDL_Renderer* sdlRenderTarget, const Vec2i cellPos) const;
+		inline bool IsForeEmpty() const;
+		inline bool IsRearEmpty() const;
+		inline bool IsWholeEmpty() const;
+		inline bool IsForeFilled() const;
+		inline bool IsRearFilled() const;
 	};
 
-	const Cell EMPTY_CELL = { 0 };
-
-	inline bool operator==(const Cell& lhs, const Cell& rhs)
+	inline bool Cell::IsForeEmpty() const
 	{
-		return lhs.TexId == rhs.TexId;
+		return ForeTile.IsEmpty();
 	}
 
-	inline bool operator!=(const Cell& lhs, const Cell& rhs)
+	inline bool Cell::IsRearEmpty() const
 	{
-		return lhs.TexId != rhs.TexId;
+		return RearTile.IsEmpty();
+	}
+
+	inline bool Cell::IsWholeEmpty() const
+	{
+		return IsForeEmpty() && IsRearEmpty();
+	}
+
+	inline bool Cell::IsForeFilled() const
+	{
+		return !ForeTile.IsEmpty();
+	}
+	inline bool Cell::IsRearFilled() const
+	{
+		return !RearTile.IsEmpty();
 	}
 }
