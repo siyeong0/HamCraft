@@ -131,9 +131,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Common\Common.cpp" />
-    <ClCompile Include="Common\Math\Numbers.h" />
-    <ClCompile Include="Common\Math\PerlinNoise.cpp" />
-    <ClCompile Include="Common\Math\Shared.cpp" />
+    <ClCompile Include="HamMath\Numbers.h" />
+    <ClCompile Include="HamMath\PerlinNoise.cpp" />
     <ClCompile Include="HamData\Tileset.cpp" />
     <ClCompile Include="HamEvent\Event.cpp" />
     <ClCompile Include="HamGame\HamCraft.cpp" />
@@ -151,11 +150,10 @@
   <ItemGroup>
     <ClInclude Include="Common\Assert.h" />
     <ClInclude Include="Common\Common.h" />
-    <ClInclude Include="Common\Math\Math.h" />
-    <ClInclude Include="Common\Math\PerlinNoise.h" />
-    <ClInclude Include="Common\Math\Rect.h" />
-    <ClInclude Include="Common\Math\Vec2.hpp" />
-    <ClInclude Include="Common\Math\Vec2i.hpp" />
+    <ClInclude Include="HamMath\Math.h" />
+    <ClInclude Include="HamMath\PerlinNoise.h" />
+    <ClInclude Include="HamMath\Rect.h" />
+    <ClInclude Include="HamMath\Vec2i.hpp" />
     <ClInclude Include="Common\Memory\Memory.hpp" />
     <ClInclude Include="Common\Types.h" />
     <ClInclude Include="HamContainer\FixedQueue.hpp" />

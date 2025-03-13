@@ -1,8 +1,8 @@
 #pragma once
 #include "Assert.h"
 #include "Memory/Memory.hpp"
-#include "Math/Math.h"
 #include "Types.h"
+#include "../HamMath/Math.h"
 
 
 namespace ham

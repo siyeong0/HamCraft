@@ -45,19 +45,16 @@
     <ClCompile Include="Common\Common.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="Common\Math\Shared.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="main.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="HamWorld\MapGeneration\MapGenerator.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="Common\Math\PerlinNoise.cpp">
+    <ClCompile Include="HamMath\PerlinNoise.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="Common\Math\Numbers.h">
+    <ClCompile Include="HamMath\Numbers.h">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="HamWorld\CellMap\Cell.cpp">
@@ -107,16 +104,13 @@
     <ClInclude Include="Common\Common.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="Common\Math\Math.h">
+    <ClInclude Include="HamMath\Math.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="Common\Math\Rect.h">
+    <ClInclude Include="HamMath\Rect.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="Common\Math\Vec2.hpp">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="Common\Math\Vec2i.hpp">
+    <ClInclude Include="HamMath\Vec2i.hpp">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="Common\Memory\Memory.hpp">
@@ -125,7 +119,7 @@
     <ClInclude Include="HamWorld\MapGeneration\MapGenerator.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="Common\Math\PerlinNoise.h">
+    <ClInclude Include="HamMath\PerlinNoise.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="HamWorld\CellMap\Cell.h">

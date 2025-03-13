@@ -3,7 +3,7 @@
 namespace ham
 {
 	Camera::Camera()
-		: mPos(Vec2{0,0})
+		: mPos(Vec2i{0,0})
 	{
 
 	}
