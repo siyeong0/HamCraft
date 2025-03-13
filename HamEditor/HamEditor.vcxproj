@@ -21,8 +21,8 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{1b8138ba-ff21-4a25-a545-3de2b2151a4f}</ProjectGuid>
-    <RootNamespace>HamCraft</RootNamespace>
+    <ProjectGuid>{05958f5b-b873-4e0d-b82d-bf6cd2ef6991}</ProjectGuid>
+    <RootNamespace>HamEditor</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -104,9 +104,6 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <LanguageStandard>stdcpp17</LanguageStandard>
-      <DisableSpecificWarnings>26819;%(DisableSpecificWarnings)</DisableSpecificWarnings>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -121,7 +118,6 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -131,47 +127,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Common\Common.cpp" />
-    <ClCompile Include="HamMath\Numbers.h" />
-    <ClCompile Include="HamMath\PerlinNoise.cpp" />
-    <ClCompile Include="HamData\Tileset.cpp" />
-    <ClCompile Include="HamEvent\Event.cpp" />
-    <ClCompile Include="HamGame\HamCraft.cpp" />
-    <ClCompile Include="HamWorld\CellMap\Cell.cpp" />
-    <ClCompile Include="HamWorld\CellMap\CellMap.cpp" />
-    <ClCompile Include="HamWorld\Chunk\Chunk.cpp" />
-    <ClCompile Include="HamWorld\Chunk\ChunkManager.cpp" />
-    <ClCompile Include="HamRenderer\Camera.cpp" />
-    <ClCompile Include="HamRenderer\Renderer.cpp" />
-    <ClCompile Include="HamRenderer\TexManager.cpp" />
-    <ClCompile Include="HamWorld\MapGeneration\MapGenerator.cpp" />
-    <ClCompile Include="HamWorld\Tile\Tile.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="TileEditor\TileEditor.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Common\Assert.h" />
-    <ClInclude Include="Common\Common.h" />
-    <ClInclude Include="HamMath\Math.h" />
-    <ClInclude Include="HamMath\PerlinNoise.h" />
-    <ClInclude Include="HamMath\Rect.h" />
-    <ClInclude Include="HamMath\Vec2i.hpp" />
-    <ClInclude Include="Common\Memory\Memory.hpp" />
-    <ClInclude Include="Common\Types.h" />
-    <ClInclude Include="HamContainer\FixedQueue.hpp" />
-    <ClInclude Include="HamData\Tileset.h" />
-    <ClInclude Include="HamEvent\Event.h" />
-    <ClInclude Include="HamGame\HamCraft.h" />
-    <ClInclude Include="HamWorld\CellMap\Cell.h" />
-    <ClInclude Include="HamWorld\CellMap\CellMap.h" />
-    <ClInclude Include="HamWorld\Chunk\Chunk.h" />
-    <ClInclude Include="HamWorld\Chunk\ChunkManager.h" />
-    <ClInclude Include="HamObject\IGameObject.h" />
-    <ClInclude Include="HamRenderer\Camera.h" />
-    <ClInclude Include="HamRenderer\Renderer.h" />
-    <ClInclude Include="HamRenderer\TexManager.h" />
-    <ClInclude Include="HamWorld\MapGeneration\MapGenerator.h" />
-    <ClInclude Include="HamWorld\SizeInfo.h" />
-    <ClInclude Include="HamWorld\Tile\Tile.h" />
+    <ClInclude Include="TileEditor\TileEditor.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
