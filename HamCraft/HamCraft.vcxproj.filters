@@ -51,6 +51,15 @@
     <ClCompile Include="main.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="HamWorld\MapGeneration\MapGenerator.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\Math\PerlinNoise.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\Math\Numbers.h">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="HamRenderer\Camera.h">
@@ -86,7 +95,7 @@
     <ClInclude Include="HamData\Tileset.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="Container\FixedQueue.hpp">
+    <ClInclude Include="HamContainer\FixedQueue.hpp">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="Common\Assert.h">
@@ -111,6 +120,12 @@
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="Common\Memory\Memory.hpp">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="HamWorld\MapGeneration\MapGenerator.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Common\Math\PerlinNoise.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>

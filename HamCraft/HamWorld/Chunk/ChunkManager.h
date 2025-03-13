@@ -2,7 +2,7 @@
 #include <vector>
 
 #include "../../Common/Common.h"
-#include "../../Container/FixedQueue.hpp"
+#include "../../HamContainer/FixedQueue.hpp"
 #include "Chunk.h"
 
 namespace ham
@@ -11,7 +11,7 @@ namespace ham
 	class ChunkManager
 	{
 	public:
-		static constexpr Vec2i MANAGE_CHUNK_DEPTH = { 32, 16 };
+		static constexpr Vec2i MANAGE_CHUNK_DEPTH = { 4, 2 };
 		static constexpr int WIDTH = 1 + 2 * MANAGE_CHUNK_DEPTH.X; // 루트와 직교하는 청크 1, 양옆/위아래로 Depth만큼
 		static constexpr int HEIGHT = 1 + 2 * MANAGE_CHUNK_DEPTH.Y;
 		static constexpr int NUM_CHUNKS = WIDTH * HEIGHT;

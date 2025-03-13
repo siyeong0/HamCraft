@@ -130,6 +130,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Common\Common.cpp" />
+    <ClCompile Include="Common\Math\Numbers.h" />
+    <ClCompile Include="Common\Math\PerlinNoise.cpp" />
     <ClCompile Include="Common\Math\Shared.cpp" />
     <ClCompile Include="HamData\Tileset.cpp" />
     <ClCompile Include="HamEvent\Event.cpp" />
@@ -140,18 +142,20 @@
     <ClCompile Include="HamRenderer\Camera.cpp" />
     <ClCompile Include="HamRenderer\Renderer.cpp" />
     <ClCompile Include="HamRenderer\TexManager.cpp" />
+    <ClCompile Include="HamWorld\MapGeneration\MapGenerator.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Common\Assert.h" />
     <ClInclude Include="Common\Common.h" />
     <ClInclude Include="Common\Math\Math.h" />
+    <ClInclude Include="Common\Math\PerlinNoise.h" />
     <ClInclude Include="Common\Math\Rect.h" />
     <ClInclude Include="Common\Math\Vec2.hpp" />
     <ClInclude Include="Common\Math\Vec2i.hpp" />
     <ClInclude Include="Common\Memory\Memory.hpp" />
     <ClInclude Include="Common\Path.h" />
-    <ClInclude Include="Container\FixedQueue.hpp" />
+    <ClInclude Include="HamContainer\FixedQueue.hpp" />
     <ClInclude Include="HamData\Tileset.h" />
     <ClInclude Include="HamEvent\Event.h" />
     <ClInclude Include="HamGame\HamCraft.h" />
@@ -163,6 +167,7 @@
     <ClInclude Include="HamRenderer\Camera.h" />
     <ClInclude Include="HamRenderer\Renderer.h" />
     <ClInclude Include="HamRenderer\TexManager.h" />
+    <ClInclude Include="HamWorld\MapGeneration\MapGenerator.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

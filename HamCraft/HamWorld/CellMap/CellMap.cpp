@@ -20,6 +20,7 @@ namespace ham
 		if (mCells == nullptr)
 			return false;
 
+		Clear();
 		return true;
 	}
 

@@ -1,11 +1,10 @@
 #include "Chunk.h"
 
-#include <algorithm>
-
 namespace ham
 {
 	Chunk::Chunk()
 		: mCellMap(nullptr)
+		, mPerlinNoise(103, PerlinNoise::EInterp::Cosine, 1, 1, 2)
 	{
 
 	}
@@ -44,12 +43,43 @@ namespace ham
 		// TODO: 파일에서 로드
 		mCellMap->Clear();
 		// 디버그용 초기화
-		for (int y = 0; y < CellMap::HEIGHT; ++y)
+		const float HEIGHT_SCALE = 1.5f;
+		CellMap& cellMap = mCellMap[0];
+
+		if (idx.X == 0 && idx.Y == 0)
 		{
-			for (int x = 0; x < CellMap::WIDTH; ++x)
+			int a = 3;
+		}
+
+		for (int x = 0; x < CellMap::WIDTH; ++x)
+		{
+			int currX = idx.X * CellMap::WIDTH - CellMap::WIDTH / 2 + x;
+			if (currX == 0)
 			{
-				CellMap& cellMap = mCellMap[0];
-				cellMap[Vec2i{x,y}] = Cell{ std::rand() % 2};
+				int a = 3;
+			}
+
+			float pn = mPerlinNoise.Get(static_cast<float>(currX));
+			int height = pn * (pn >= 0 ? HEIGHT_SCALE : 1);
+			int yStart = idx.Y * CellMap::HEIGHT - CellMap::HEIGHT / 2;
+			int yEnd = yStart + CellMap::HEIGHT - 1;
+			if (height < yStart)
+			{
+				continue;
+			}
+			else if (height > yEnd)
+			{
+				for (int y = 0; y < CellMap::HEIGHT; ++y)
+				{
+					cellMap[Vec2i{ x,y }] = Cell{ 1 };
+				}
+			}
+			else
+			{
+				for (int y = 0; y < height - yStart; ++y)
+				{
+					cellMap[Vec2i{ x,y }] = Cell{ 1 };
+				}
 			}
 		}
 	}

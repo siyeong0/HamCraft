@@ -10,7 +10,6 @@ int main(void)
 {	
 	HamCraft game;
 	game.Initialize();
-
 	game.Run();
 
 	return 0;
