@@ -60,7 +60,7 @@ namespace ham
 			}
 
 			float pn = mPerlinNoise.Get(static_cast<float>(currX));
-			int height = pn * (pn >= 0 ? HEIGHT_SCALE : 1);
+			int height = static_cast<int>(pn * (pn >= 0 ? HEIGHT_SCALE : 1));
 			int yStart = idx.Y * CellMap::HEIGHT - CellMap::HEIGHT / 2;
 			int yEnd = yStart + CellMap::HEIGHT - 1;
 			if (height < yStart)

@@ -136,6 +136,7 @@
     <ClCompile Include="HamData\Tileset.cpp" />
     <ClCompile Include="HamEvent\Event.cpp" />
     <ClCompile Include="HamGame\HamCraft.cpp" />
+    <ClCompile Include="HamWorld\CellMap\Cell.cpp" />
     <ClCompile Include="HamWorld\CellMap\CellMap.cpp" />
     <ClCompile Include="HamWorld\Chunk\Chunk.cpp" />
     <ClCompile Include="HamWorld\Chunk\ChunkManager.cpp" />
