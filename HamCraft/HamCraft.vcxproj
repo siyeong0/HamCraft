@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -132,6 +132,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Common\Common.cpp" />
+    <ClCompile Include="HamECS\Component.h" />
     <ClCompile Include="HamMath\Numbers.h" />
     <ClCompile Include="HamMath\PerlinNoise.cpp" />
     <ClCompile Include="HamData\Tileset.cpp" />
@@ -151,6 +152,9 @@
   <ItemGroup>
     <ClInclude Include="Common\Assert.h" />
     <ClInclude Include="Common\Common.h" />
+    <ClInclude Include="HamECS\Entity.h" />
+    <ClInclude Include="HamECS\EntityManager.h" />
+    <ClInclude Include="HamECS\Signature.h" />
     <ClInclude Include="HamMath\Math.h" />
     <ClInclude Include="HamMath\PerlinNoise.h" />
     <ClInclude Include="HamMath\Rect.h" />
