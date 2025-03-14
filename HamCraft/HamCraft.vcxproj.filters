@@ -63,6 +63,9 @@
     <ClCompile Include="HamWorld\Tile\Tile.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="HamECS\Component.h">
+      <Filter>헤더 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="HamRenderer\Camera.h">
@@ -132,6 +135,27 @@
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="Common\Types.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="HamECS\Entity.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="HamECS\EntityManager.hpp">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="HamECS\Signature.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="HamECS\ComponentArray.hpp">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="HamECS\ComponentManager.hpp">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="HamECS\System.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="HamECS\SystemManager.hpp">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>

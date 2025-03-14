@@ -152,9 +152,13 @@
   <ItemGroup>
     <ClInclude Include="Common\Assert.h" />
     <ClInclude Include="Common\Common.h" />
+    <ClInclude Include="HamECS\ComponentArray.hpp" />
+    <ClInclude Include="HamECS\ComponentManager.hpp" />
     <ClInclude Include="HamECS\Entity.h" />
-    <ClInclude Include="HamECS\EntityManager.h" />
+    <ClInclude Include="HamECS\EntityManager.hpp" />
     <ClInclude Include="HamECS\Signature.h" />
+    <ClInclude Include="HamECS\System.h" />
+    <ClInclude Include="HamECS\SystemManager.hpp" />
     <ClInclude Include="HamMath\Math.h" />
     <ClInclude Include="HamMath\PerlinNoise.h" />
     <ClInclude Include="HamMath\Rect.h" />
