@@ -4,8 +4,8 @@ public class Player : MonoBehaviour
 {
 	public float maxSpeed = 7f;
 	public float jumpForce = 5f;
-
-	Transform mTransform;
+	
+    Transform mTransform;
 	Rigidbody2D mRigidBody;
 	SpriteRenderer mSpriteRenderer;
 	Animator mAnimator;
