@@ -43,11 +43,11 @@ public class Player : MonoBehaviour
 		}
 
 		// sprite direction
-		if (!mbFacingRight && mRigidBody.linearVelocityX > 5f)
+		if (!mbFacingRight && mRigidBody.linearVelocityX > 0.01f)
 		{
 			flip();
 		}
-		else if (mbFacingRight && mRigidBody.linearVelocityX < -5f)
+		else if (mbFacingRight && mRigidBody.linearVelocityX < -0.01f)
 		{
 			flip();
 		}
