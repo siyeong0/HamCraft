@@ -2,52 +2,45 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
-public class TerrainGenerator : MonoBehaviour
+public class TerrainGenerator
 {
-	[SerializeField] int width, height;
-	[SerializeField] Tilemap frontTilemap;
-	[SerializeField] Tilemap rearTilemap;
-	[SerializeField] TileBase[] tiles;
+	int width;
+	int height;
+	TileBase[] tiles;
 
-	[Header("Terrain Generation")]
-	[SerializeField] float smoothness = 64;
-	[SerializeField] int avgGrassHeight = 5;
-	[SerializeField] float seed;
-	// [SerializeField] int interval;
-	int interval;
+	// terrain generation
+	float smoothness = 64;
+	int avgGrassHeight = 5;
+	float seed;
 
-	[Header("Cave Generation")]
-	[Range(0, 1)]
-	[SerializeField] float modifier;
-	[SerializeField] int smoothCount;
-
+	// cave generation
+	float modifier;
+	int smoothCount;
 
 	const int GRASS_DIFF = 2;
 	const int GRASS_SECTION_WIDTH = 5;
-	// Start is called once before the first execution of Update after the MonoBehaviour is created
-	void Start()
+
+	public TerrainGenerator()
 	{
-		Generate();
+		width = ChunkManager.Instance.chunkSize.x;
+		height = ChunkManager.Instance.chunkSize.y;
+		tiles = ChunkManager.Instance.tiles;
+
+		smoothness = ChunkManager.Instance.smoothness;
+		avgGrassHeight = ChunkManager.Instance.avgGrassHeight;
+		seed = ChunkManager.Instance.seed;
+
+		modifier = ChunkManager.Instance.modifier;
+		smoothCount = ChunkManager.Instance.smoothCount;
 	}
 
-	// Update is called once per frame
-	void Update()
+	public void Generate(Vector2 positionOffset, Tilemap frontTilemap, Tilemap backTilemap)
 	{
-		if (Input.GetKeyDown(KeyCode.F5))
-		{
-			Generate();
-		}
-	}
-
-	void Generate()
-	{
-		seed = Random.Range(1, 10000);
 		frontTilemap.ClearAllTiles();
-		rearTilemap.ClearAllTiles();
+		backTilemap.ClearAllTiles();
 
-		int[,] terrain = generateTerrainSmoothPerlin();
-		// generateCavePerlin(map);
-		int[,] cave = generateCaveCelluarAutomata();
+		int[,] terrain = generateTerrainSmoothPerlin(positionOffset);
+		int[,] cave = generateCavePerlin(positionOffset);
 
 		int[,] map = new int[width, height];
 		for (int x = 0; x < width; ++x)
@@ -58,18 +51,18 @@ public class TerrainGenerator : MonoBehaviour
 			}
 		}
 
-		renderMap(frontTilemap, map);
-		renderMap(rearTilemap, terrain);
+		renderMap(frontTilemap, map, positionOffset);
+		renderMap(backTilemap, terrain, positionOffset);
 	}
 
-	int[,] generateTerrainSmoothPerlin()
+	int[,] generateTerrainSmoothPerlin(Vector2 positionOffset)
 	{
 		int[,] map = new int[width, height];
 		// height map
 		int[] heightMap = new int[width];
 		for (int x = 0; x < width; ++x)
 		{
-			int perlineHeight = Mathf.RoundToInt(Mathf.PerlinNoise((float)x / smoothness, seed) * height);
+			int perlineHeight = Mathf.RoundToInt(Mathf.PerlinNoise(((float)x + positionOffset.x) / smoothness, seed) * height);
 			heightMap[x] = perlineHeight;
 		}
 		// grass height map
@@ -98,15 +91,19 @@ public class TerrainGenerator : MonoBehaviour
 		// fill buffer map
 		for (int x = 0; x < width; ++x)
 		{
-			int height = heightMap[x];
-			int grassHeight = grassHeightMap[x];
 			int y = 0;
-			for (; y < height - grassHeight; ++y)
+			for (; y < height; ++y)
 			{
+				if (positionOffset.y + y > heightMap[x] - grassHeightMap[x])
+					break;
+
 				map[x, y] = 2;  // stone
 			}
-			for (int gh = 0; gh < grassHeight; ++gh)
+
+			for (int gh = 0; y + gh < height; ++gh)
 			{
+				if (positionOffset.y + y + gh > heightMap[x])
+					break;
 				map[x, y + gh] = 1;  // grass
 			}
 		}
@@ -114,19 +111,23 @@ public class TerrainGenerator : MonoBehaviour
 		return map;
 	}
 
-	void generateCavePerlin(int[,] map)
+	int[,] generateCavePerlin(Vector2 positionOffset)
 	{
+		int[,] map = new int[width, height];
 		for (int x = 0; x < width; ++x)
 		{
 			for (int y = 0; y < height; ++y)
 			{
-				int caveValue = Mathf.RoundToInt(Mathf.PerlinNoise((float)x * modifier + seed, (float)y * modifier + seed));
-				map[x, y] = caveValue == 1 ? 0 : map[x, y];
+				int caveValue = Mathf.RoundToInt(Mathf.PerlinNoise(
+					((float)x + positionOffset.x) * modifier + seed,
+					((float)y + positionOffset.y) * modifier + seed));
+				map[x, y] = caveValue == 1 ? 0 : 1;
 			}
 		}
+		return map;
 	}
 
-	int[,] generateCaveCelluarAutomata()
+	int[,] generateCaveCelluarAutomata(Vector2 positionOffset)
 	{
 		int[,] map = new int[width, height];
 		for (int x = 0; x < width; ++x)
@@ -209,15 +210,13 @@ public class TerrainGenerator : MonoBehaviour
 		return count;
 	}
 
-	void renderMap(Tilemap tilemap, int[,] map)
+	void renderMap(Tilemap tilemap, int[,] map, Vector2 positionOffset)
 	{
 		for (int x = 0; x < width; x++)
 		{
 			for (int y = 0; y < height; y++)
 			{
-				// if (map[x, y] == 0) continue;	// TODO: 0번 타일을 투명 타일로 설정
-				TileBase tile = tiles[map[x, y]];
-				tilemap.SetTile(new Vector3Int(x - width / 2, y - height, 0), tile);
+				tilemap.SetTile(new Vector3Int(x, y, 0), tiles[map[x, y]]);
 			}
 		}
 	}

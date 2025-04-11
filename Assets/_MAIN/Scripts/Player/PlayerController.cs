@@ -20,6 +20,8 @@ public class Player : MonoBehaviour
 		mRigidBody = GetComponent<Rigidbody2D>();
 		mSpriteRenderer = GetComponent<SpriteRenderer>();
 		mAnimator = GetComponent<Animator>();
+
+		mTransform.position = new Vector3(5f, 100f, 0f);
 	}
 
 	// Update is called once per frame
