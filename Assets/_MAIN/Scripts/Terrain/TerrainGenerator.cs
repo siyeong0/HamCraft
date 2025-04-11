@@ -5,15 +5,21 @@ using UnityEngine.Tilemaps;
 public class TerrainGenerator : MonoBehaviour
 {
 	[SerializeField] int width, height;
-	// [SerializeField] int interval;
-	int interval;
+	[SerializeField] Tilemap frontTilemap;
+	[SerializeField] Tilemap rearTilemap;
+	[SerializeField] TileBase[] tiles;
+
+	[Header("Terrain Generation")]
 	[SerializeField] float smoothness = 64;
 	[SerializeField] int avgGrassHeight = 5;
 	[SerializeField] float seed;
+	// [SerializeField] int interval;
+	int interval;
 
-
-	[SerializeField] TileBase[] tiles;
-	[SerializeField] Tilemap tilemap;
+	[Header("Cave Generation")]
+	[Range(0, 1)]
+	[SerializeField] float modifier;
+	[SerializeField] int smoothCount;
 
 
 	const int GRASS_DIFF = 2;
@@ -35,15 +41,30 @@ public class TerrainGenerator : MonoBehaviour
 
 	void Generate()
 	{
-		if (seed == 0) seed = Random.Range(1, 10000);
-		tilemap.ClearAllTiles();
+		seed = Random.Range(1, 10000);
+		frontTilemap.ClearAllTiles();
+		rearTilemap.ClearAllTiles();
+
+		int[,] terrain = generateTerrainSmoothPerlin();
+		// generateCavePerlin(map);
+		int[,] cave = generateCaveCelluarAutomata();
+
 		int[,] map = new int[width, height];
-		generateTerrainSmoothPerlin(map);
-		renderMap(map);
+		for (int x = 0; x < width; ++x)
+		{
+			for (int y = 0; y < height; ++y)
+			{
+				map[x, y] = cave[x, y] == 0 ? 0 : terrain[x, y];
+			}
+		}
+
+		renderMap(frontTilemap, map);
+		renderMap(rearTilemap, terrain);
 	}
 
-	void generateTerrainSmoothPerlin(int[,] map)
+	int[,] generateTerrainSmoothPerlin()
 	{
+		int[,] map = new int[width, height];
 		// height map
 		int[] heightMap = new int[width];
 		for (int x = 0; x < width; ++x)
@@ -82,49 +103,113 @@ public class TerrainGenerator : MonoBehaviour
 			int y = 0;
 			for (; y < height - grassHeight; ++y)
 			{
-				map[x, y] = 2;	// stone
+				map[x, y] = 2;  // stone
 			}
 			for (int gh = 0; gh < grassHeight; ++gh)
 			{
 				map[x, y + gh] = 1;  // grass
 			}
 		}
+
+		return map;
 	}
 
-	void generateTerrainSmoothIntervalPerlin(int[,] map)
+	void generateCavePerlin(int[,] map)
 	{
-		float reduction = 0.5f;
-
-		List<int> noiseX = new List<int>();
-		List<int> noiseY = new List<int>();
-
-		for (int x = 0; x < width; x += interval)
+		for (int x = 0; x < width; ++x)
 		{
-			int perlinPoint = Mathf.FloorToInt(Mathf.PerlinNoise((float)x / smoothness, seed * reduction) * height);
-			noiseX.Add(x);
-			noiseY.Add(perlinPoint);
-		}
-
-		for (int i = 1; i < noiseY.Count; ++i)
-		{
-			Vector2Int currPos = new Vector2Int(noiseX[i], noiseY[i]);
-			Vector2Int lastPos = new Vector2Int(noiseX[i - 1], noiseY[i - 1]);
-			Vector2 diff = currPos - lastPos;
-
-			float heightDiff = diff.y / interval;
-			float currHeight = lastPos.y;
-			for (int x = lastPos.x; x < currPos.x; ++x)
+			for (int y = 0; y < height; ++y)
 			{
-				for (int y = Mathf.FloorToInt(currHeight); y > 0; --y)
-				{
-					map[x, y] = 1;
-				}
-				currHeight += heightDiff;
+				int caveValue = Mathf.RoundToInt(Mathf.PerlinNoise((float)x * modifier + seed, (float)y * modifier + seed));
+				map[x, y] = caveValue == 1 ? 0 : map[x, y];
 			}
 		}
 	}
 
-	void renderMap(int[,] map)
+	int[,] generateCaveCelluarAutomata()
+	{
+		int[,] map = new int[width, height];
+		for (int x = 0; x < width; ++x)
+		{
+			for (int y = 0; y < height; ++y)
+			{
+				if (x == 0 || x == width - 1 || y == 0 || y == height - 1)
+				{
+					map[x, y] = 1;
+				}
+				else
+				{
+					map[x, y] = Random.Range(0f, 1f) < modifier ? 0 : 1;
+				}
+			}
+		}
+
+		for (int i = 0; i < smoothCount; ++i)
+		{
+			int[,] bufferMap = new int[width, height];
+			for (int x = 0; x < width; ++x)
+			{
+				for (int y = 0; y < height; ++y)
+				{
+					if (x == 0 || x == width - 1 || y == 0 || y == height - 1)
+					{
+						bufferMap[x, y] = 1;
+					}
+					else
+					{
+						if (countAdjacentWalls(map, x, y) >= 5 || countNearbyWalls(map, x, y) <= 2)
+						{
+							bufferMap[x, y] = 1;
+						}
+					}
+				}
+			}
+			map = bufferMap;
+		}
+
+		return map;
+	}
+
+	int countAdjacentWalls(int[,] map, int x, int y)
+	{
+		int count = 0;
+		for (int neighborX = x - 1; neighborX <= x + 1; ++neighborX)
+		{
+			for (int neighborY = y - 1; neighborY <= y + 1; ++neighborY)
+			{
+				if (neighborX >= 0 && neighborX < width && neighborY >= 0 && neighborY < height)
+				{
+					if (map[neighborX, neighborY] != 0)
+					{
+						count++;
+					}
+				}
+			}
+		}
+		return count;
+	}
+
+	int countNearbyWalls(int[,] map, int x, int y)
+	{
+		int count = 0;
+		for (int neighborX = x - 2; neighborX <= x + 2; ++neighborX)
+		{
+			for (int neighborY = y - 2; neighborY <= y + 2; ++neighborY)
+			{
+				if (Mathf.Abs(neighborX - x) == 2 && Mathf.Abs(neighborY - y) == 2)
+					continue;
+
+				if (neighborX < 0 || neighborY < 0 || neighborX >= width || neighborY >= height)
+					continue;
+
+				if (map[neighborX, neighborY] != 0)
+					++count;
+			}
+		}
+		return count;
+	}
+
+	void renderMap(Tilemap tilemap, int[,] map)
 	{
 		for (int x = 0; x < width; x++)
 		{
