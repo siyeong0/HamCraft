@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
@@ -9,8 +10,9 @@ public class TerrainGenerator
 	TileBase[] tiles;
 
 	// terrain generation
-	float smoothness = 64;
-	int avgGrassHeight = 5;
+	float smoothness;
+	float maxHeight;
+	int avgGrassHeight;
 	float seed;
 
 	// cave generation
@@ -19,7 +21,7 @@ public class TerrainGenerator
 
 	const int GRASS_DIFF = 2;
 	const int GRASS_SECTION_WIDTH = 5;
-
+	const float PERLINE_OFFSET = 5000f; // to avoid repeating patterns
 	public TerrainGenerator()
 	{
 		width = ChunkManager.Instance.chunkSize.x;
@@ -27,6 +29,7 @@ public class TerrainGenerator
 		tiles = ChunkManager.Instance.tiles;
 
 		smoothness = ChunkManager.Instance.smoothness;
+		maxHeight = ChunkManager.Instance.maxHeight;
 		avgGrassHeight = ChunkManager.Instance.avgGrassHeight;
 		seed = ChunkManager.Instance.seed;
 
@@ -34,25 +37,23 @@ public class TerrainGenerator
 		smoothCount = ChunkManager.Instance.smoothCount;
 	}
 
-	public void Generate(Vector2 positionOffset, Tilemap frontTilemap, Tilemap backTilemap)
+	public void Generate(Vector2 positionOffset, out int[,] frontTilemap, out int[,] backTilemap)
 	{
-		frontTilemap.ClearAllTiles();
-		backTilemap.ClearAllTiles();
 
 		int[,] terrain = generateTerrainSmoothPerlin(positionOffset);
 		int[,] cave = generateCavePerlin(positionOffset);
 
-		int[,] map = new int[width, height];
+		int[,] frontMap = new int[width, height];
 		for (int x = 0; x < width; ++x)
 		{
 			for (int y = 0; y < height; ++y)
 			{
-				map[x, y] = cave[x, y] == 0 ? 0 : terrain[x, y];
+				frontMap[x, y] = cave[x, y] == 0 ? 0 : terrain[x, y];
 			}
 		}
 
-		renderMap(frontTilemap, map, positionOffset);
-		renderMap(backTilemap, terrain, positionOffset);
+		frontTilemap = frontMap;
+		backTilemap = terrain;
 	}
 
 	int[,] generateTerrainSmoothPerlin(Vector2 positionOffset)
@@ -62,7 +63,7 @@ public class TerrainGenerator
 		int[] heightMap = new int[width];
 		for (int x = 0; x < width; ++x)
 		{
-			int perlineHeight = Mathf.RoundToInt(Mathf.PerlinNoise(((float)x + positionOffset.x) / smoothness, seed) * height);
+			int perlineHeight = Mathf.RoundToInt(Mathf.PerlinNoise((positionOffset.x + (float)(x + PERLINE_OFFSET)) / smoothness, seed) * maxHeight);
 			heightMap[x] = perlineHeight;
 		}
 		// grass height map
@@ -119,8 +120,8 @@ public class TerrainGenerator
 			for (int y = 0; y < height; ++y)
 			{
 				int caveValue = Mathf.RoundToInt(Mathf.PerlinNoise(
-					((float)x + positionOffset.x) * modifier + seed,
-					((float)y + positionOffset.y) * modifier + seed));
+					((float)(x + PERLINE_OFFSET) + positionOffset.x) * modifier + seed,
+					((float)(y + PERLINE_OFFSET) + positionOffset.y) * modifier + seed));
 				map[x, y] = caveValue == 1 ? 0 : 1;
 			}
 		}
@@ -140,7 +141,7 @@ public class TerrainGenerator
 				}
 				else
 				{
-					map[x, y] = Random.Range(0f, 1f) < modifier ? 0 : 1;
+					map[x, y] = UnityEngine.Random.Range(0f, 1f) < modifier ? 0 : 1;
 				}
 			}
 		}
@@ -208,16 +209,5 @@ public class TerrainGenerator
 			}
 		}
 		return count;
-	}
-
-	void renderMap(Tilemap tilemap, int[,] map, Vector2 positionOffset)
-	{
-		for (int x = 0; x < width; x++)
-		{
-			for (int y = 0; y < height; y++)
-			{
-				tilemap.SetTile(new Vector3Int(x, y, 0), tiles[map[x, y]]);
-			}
-		}
 	}
 }
