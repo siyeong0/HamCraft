@@ -20,6 +20,7 @@ public class ChunkManager : MonoBehaviour
 	[SerializeField] public TileBase[] tiles;
 
 	[SerializeField] public float smoothness = 64;
+	[SerializeField] public float maxHeight = 10;
 	[SerializeField] public int avgGrassHeight = 5;
 	[SerializeField] public float seed;
 
@@ -27,6 +28,11 @@ public class ChunkManager : MonoBehaviour
 	[Range(0, 1)]
 	[SerializeField] public float modifier;
 	[SerializeField] public int smoothCount;
+
+	GameObject mFrontTilemapObject;
+	GameObject mBackTilemapObject;
+	Tilemap mFrontTilemap;
+	Tilemap mBackTilemap;
 
 	TerrainGenerator mTerrainGenerator;
 	Dictionary<Vector2Int, Terrain.Chunk> mChunks;
@@ -47,7 +53,17 @@ public class ChunkManager : MonoBehaviour
 		}
 	}
 	void Start()
-    {
+	{ 
+		GameObject chunk = Instantiate(chunkPrefab);
+		mFrontTilemapObject = chunk.transform.GetChild(1).gameObject;
+		mBackTilemapObject = chunk.transform.GetChild(0).gameObject;
+		mFrontTilemapObject.transform.SetParent(transform);
+		mBackTilemapObject.transform.SetParent(transform);
+		Destroy(chunk);
+
+		mFrontTilemap = mFrontTilemapObject.GetComponent<Tilemap>();
+		mBackTilemap = mBackTilemapObject.GetComponent<Tilemap>();
+
 		mTerrainGenerator = new TerrainGenerator();
 		mChunks = new Dictionary<Vector2Int, Chunk>();
 		mCurrPivotChunk = CvtWorld2ChunkCoord(pivot.position);
@@ -71,7 +87,8 @@ public class ChunkManager : MonoBehaviour
 
 					if (!mChunks.ContainsKey(coord))
 					{
-						mChunks[coord] = new Chunk(coord, chunkPrefab, mTerrainGenerator);
+						mChunks[coord] = new Chunk(coord, mTerrainGenerator);
+						mChunks[coord].Draw(mFrontTilemap, mBackTilemap);
 					}
 				}
 			}
@@ -82,16 +99,18 @@ public class ChunkManager : MonoBehaviour
 			{
 				if (!newChunkSet.Contains(coord))
 				{
-					mChunks[coord].Destroy();
+					mChunks[coord].Erase(mFrontTilemap, mBackTilemap);
 					mChunks.Remove(coord);
 				}
 			}
 
-			// refresh tiles
-			foreach (var chunk in mChunks)
-			{
-				chunk.Value.RefreshTile();
-			}
+			// resize tilemaps
+			mFrontTilemap.CompressBounds();
+			mBackTilemap.CompressBounds();
+
+			//BoundsInt defaultBound = mFrontTilemap.cellBounds;
+			//BoundsInt compressBound = mBackTilemap.cellBounds;
+			//Debug.Log($"Default Bound: {defaultBound} Compress Bound :  {compressBound}");
 		}
 		Vector2Int pivotChunk = CvtWorld2ChunkCoord(pivot.position);
 		mbUpdateChunk = pivotChunk != mCurrPivotChunk;

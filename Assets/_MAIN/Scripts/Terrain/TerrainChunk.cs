@@ -6,41 +6,53 @@ namespace Terrain
 	public class Chunk
 	{
 		Vector2Int mChunkIdx;
-		GameObject mFrontTilemapObject;
-		GameObject mBackTilemapObject;
-		Tilemap mFrontTilemap;
-		Tilemap mBackTilemap;
+		Vector2 mChunkBasePosition;
+		int[,] mFrontBuffer;
+		int[,] mBackBuffer;
 
-		public Chunk(Vector2Int chunkIdx, GameObject chunkPrefab, TerrainGenerator terrainGenerator)
+		public Chunk(Vector2Int chunkIdx, TerrainGenerator terrainGenerator)
 		{
+			// chunk info
 			mChunkIdx = chunkIdx;
-			Vector2 chunkPosition = ChunkManager.Instance.CvtChunk2WorldCoord(chunkIdx);
-			GameObject chunk = Object.Instantiate(chunkPrefab, chunkPosition, Quaternion.identity);
-
-			mFrontTilemapObject = chunk.transform.GetChild(1).gameObject;
-			mBackTilemapObject = chunk.transform.GetChild(0).gameObject;
-			mFrontTilemap = mFrontTilemapObject.GetComponent<Tilemap>();
-			mBackTilemap = mBackTilemapObject.GetComponent<Tilemap>();
-
-			// set parent
-			mFrontTilemapObject.transform.SetParent(ChunkManager.Instance.transform);
-			mBackTilemapObject.transform.SetParent(ChunkManager.Instance.transform);
-			Object.Destroy(chunk);
-
+			mChunkBasePosition = ChunkManager.Instance.CvtChunk2WorldBaseCoord(chunkIdx);
+			// allocate buffers
+			mFrontBuffer = new int[ChunkManager.Instance.chunkSize.x, ChunkManager.Instance.chunkSize.y];
+			mBackBuffer = new int[ChunkManager.Instance.chunkSize.x, ChunkManager.Instance.chunkSize.y];
 			// generate terrain
 			Vector2 chunkBasePosition = ChunkManager.Instance.CvtChunk2WorldBaseCoord(chunkIdx);
-			terrainGenerator.Generate(chunkBasePosition, mFrontTilemap, mBackTilemap);
+			terrainGenerator.Generate(chunkBasePosition, out mFrontBuffer, out mBackBuffer);
 		}
 
-		public void Destroy()
+		public void Draw(Tilemap frontMap, Tilemap backMap)
 		{
-			Object.Destroy(mFrontTilemapObject);
-			Object.Destroy(mBackTilemapObject);
+			for (int x = 0; x < ChunkManager.Instance.chunkSize.x; ++x)
+			{
+				for (int y = 0; y < ChunkManager.Instance.chunkSize.y; ++y)
+				{
+					Vector3Int tilemapIdx = new Vector3Int(Mathf.FloorToInt(mChunkBasePosition.x + x), Mathf.FloorToInt(mChunkBasePosition.y + y), 0);
+					if (mFrontBuffer[x, y] != 0)
+					{
+						frontMap.SetTile(tilemapIdx, ChunkManager.Instance.tiles[mFrontBuffer[x, y]]);
+					}
+					if (mBackBuffer[x, y] != 0)
+					{
+						backMap.SetTile(tilemapIdx, ChunkManager.Instance.tiles[mBackBuffer[x, y]]);
+					}
+				}
+			}
 		}
-		public void RefreshTile()
+
+		public void Erase(Tilemap frontMap, Tilemap backMap)
 		{
-			mFrontTilemap.RefreshAllTiles();
-			mBackTilemap.RefreshAllTiles();
+			for (int x = 0; x < ChunkManager.Instance.chunkSize.x; ++x)
+			{
+				for (int y = 0; y < ChunkManager.Instance.chunkSize.y; ++y)
+				{
+					Vector3Int tilemapIdx = new Vector3Int(Mathf.FloorToInt(mChunkBasePosition.x + x), Mathf.FloorToInt(mChunkBasePosition.y + y), 0);
+					frontMap.SetTile(tilemapIdx, null);
+					backMap.SetTile(tilemapIdx, null);
+				}
+			}
 		}
 	}
 }
