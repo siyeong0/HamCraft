@@ -351,7 +351,7 @@ Transform:
   m_GameObject: {fileID: 220282958}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0, y: 0, z: 0}
+  m_LocalPosition: {x: -0, y: 64, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -417,10 +417,11 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 472050875}
-  - component: {fileID: 472050874}
   - component: {fileID: 472050876}
+  - component: {fileID: 472050874}
+  - component: {fileID: 472050877}
   m_Layer: 0
-  m_Name: ChunkManager
+  m_Name: World
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -439,19 +440,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   chunkPrefab: {fileID: 1677113315687972122, guid: 585dd2b41e592384ead8e8930d2f8b79, type: 3}
-  chunkSize: {x: 128, y: 32}
+  chunkSize: {x: 64, y: 32}
   pivot: {fileID: 519420032}
   simulateDepth: {x: 4, y: 4}
   tiles:
   - {fileID: 0}
   - {fileID: 11400000, guid: f063e93de001a2b4cac1921ddc2fb605, type: 2}
   - {fileID: 11400000, guid: 916e4d1268a0cc94b940827323e45172, type: 2}
-  smoothness: 64
-  maxHeight: 40
-  avgGrassHeight: 5
-  seed: 0
-  modifier: 0.097
-  smoothCount: 4
 --- !u!4 &472050875
 Transform:
   m_ObjectHideFlags: 0
@@ -479,6 +474,24 @@ Grid:
   m_CellGap: {x: 0, y: 0, z: 0}
   m_CellLayout: 0
   m_CellSwizzle: 0
+--- !u!114 &472050877
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 472050873}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: be8737a36b41de743801231219310501, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  smoothness: 128
+  maxHeight: 32
+  avgGrassHeight: 5
+  seed: 0
+  modifier: 0.246
+  smoothCount: 4
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -629,7 +642,7 @@ PositionConstraint:
   serializedVersion: 2
   m_Weight: 1
   m_TranslationAtRest: {x: 0, y: 2.7, z: -10}
-  m_TranslationOffset: {x: 0, y: 2.7, z: -10}
+  m_TranslationOffset: {x: 0, y: -61.3, z: -10}
   m_AffectTranslationX: 1
   m_AffectTranslationY: 1
   m_AffectTranslationZ: 1

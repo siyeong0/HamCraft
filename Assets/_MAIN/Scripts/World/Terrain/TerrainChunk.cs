@@ -23,7 +23,7 @@ namespace Terrain
 			terrainGenerator.Generate(chunkBasePosition, out mFrontBuffer, out mBackBuffer);
 		}
 
-		public void Draw(Tilemap frontMap, Tilemap backMap)
+		public void Draw(Tilemap frontMap, Tilemap backMap, TileBase[] tiles)
 		{
 			for (int x = 0; x < ChunkManager.Instance.chunkSize.x; ++x)
 			{
@@ -32,11 +32,11 @@ namespace Terrain
 					Vector3Int tilemapIdx = new Vector3Int(Mathf.FloorToInt(mChunkBasePosition.x + x), Mathf.FloorToInt(mChunkBasePosition.y + y), 0);
 					if (mFrontBuffer[x, y] != 0)
 					{
-						frontMap.SetTile(tilemapIdx, ChunkManager.Instance.tiles[mFrontBuffer[x, y]]);
+						frontMap.SetTile(tilemapIdx, tiles[mFrontBuffer[x, y]]);
 					}
 					if (mBackBuffer[x, y] != 0)
 					{
-						backMap.SetTile(tilemapIdx, ChunkManager.Instance.tiles[mBackBuffer[x, y]]);
+						backMap.SetTile(tilemapIdx, tiles[mBackBuffer[x, y]]);
 					}
 				}
 			}
