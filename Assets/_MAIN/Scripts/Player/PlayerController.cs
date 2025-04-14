@@ -26,14 +26,14 @@ public class Player : MonoBehaviour
 	void Update()
 	{
 		// block add/remove
-		if (Input.GetMouseButtonDown(0))
+		if (Input.GetMouseButton(0))
 		{
 			Vector3 mouseScreenPos = Input.mousePosition;
 			Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(mouseScreenPos);
 
 			World.AddBlockAt(1, mouseWorldPos, Terrain.ETerrainLayer.Front);
 		}
-		else if (Input.GetMouseButtonDown(1))
+		else if (Input.GetMouseButton(1))
 		{
 			Vector3 mouseScreenPos = Input.mousePosition;
 			Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(mouseScreenPos);

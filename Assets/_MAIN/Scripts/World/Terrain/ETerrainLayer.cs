@@ -1,6 +1,4 @@
-﻿using UnityEditor;
-using UnityEngine;
-
+﻿
 namespace Terrain
 {
 	public enum ETerrainLayer : int

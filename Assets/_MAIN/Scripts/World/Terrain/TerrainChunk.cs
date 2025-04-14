@@ -2,8 +2,6 @@ using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using System.Collections.Generic;
-using System;
-using static Unity.Collections.AllocatorManager;
 
 namespace Terrain
 {
