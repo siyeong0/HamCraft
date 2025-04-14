@@ -1,16 +1,50 @@
+using NUnit.Framework;
+using Terrain;
 using UnityEngine;
+using static Unity.Collections.AllocatorManager;
 
-public class World : MonoBehaviour
+public class World
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
+	World()
+	{
+		Assert.IsTrue(false);
+	}
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+	public static int GetBlockAt(Vector2 position, ETerrainLayer layer)
+	{
+		Vector2Int chunkIdx = ChunkManager.Instance.CvtWorld2ChunkCoord(position);
+		Terrain.Chunk chunk = ChunkManager.Instance.GetChunk(chunkIdx);
+		Vector2Int blockIdx = chunk.GetBlockIdx(position);
+		int block = chunk.GetBlockAt(blockIdx.x, blockIdx.y, layer);
+
+		return block;
+	}
+
+	public static bool AddBlockAt(int block, Vector2 position, ETerrainLayer layer)
+	{
+		Vector2Int chunkIdx = ChunkManager.Instance.CvtWorld2ChunkCoord(position);
+		Terrain.Chunk chunk = ChunkManager.Instance.GetChunk(chunkIdx);
+		Vector2Int blockIdx = chunk.GetBlockIdx(position);
+		bool bAdded = chunk.AddBlockAt(block, blockIdx.x, blockIdx.y, layer);
+
+		return bAdded;
+	}
+
+	public static bool RemoveBlockAt(Vector2 position, ETerrainLayer layer)
+	{
+		Vector2Int chunkIdx = ChunkManager.Instance.CvtWorld2ChunkCoord(position);
+		Terrain.Chunk chunk = ChunkManager.Instance.GetChunk(chunkIdx);
+		Vector2Int blockIdx = chunk.GetBlockIdx(position);
+		bool bRemoved = chunk.RemoveBlockAt(blockIdx.x, blockIdx.y, layer);
+
+		return bRemoved;
+	}
+
+	public static void EmplaceBlockAt(int block, Vector2 position, ETerrainLayer layer)
+	{
+		Vector2Int chunkIdx = ChunkManager.Instance.CvtWorld2ChunkCoord(position);
+		Terrain.Chunk chunk = ChunkManager.Instance.GetChunk(chunkIdx);
+		Vector2Int blockIdx = chunk.GetBlockIdx(position);
+		chunk.EmplaceBlockAt(block, blockIdx.x, blockIdx.y, layer);
+	}
 }

@@ -29,9 +29,14 @@ namespace Terrain
 			height = ChunkManager.Instance.chunkSize.y;
 		}
 
-		public void Generate(Vector2 positionOffset, out int[,] frontTilemap, out int[,] backTilemap)
+		public List<int[,]> Generate(Vector2 positionOffset)
 		{
+			// alloc buffers
+			int numLayers = Enum.GetValues(typeof(ETerrainLayer)).Length;
+			var mapBuffers = new List<int[,]>();
+			for (int i = 0; i < numLayers; ++i) mapBuffers.Add(null);
 
+			// generate terrain
 			int[,] terrain = generateTerrainSmoothPerlin(positionOffset);
 			int[,] cave = generateCavePerlin(positionOffset);
 
@@ -44,8 +49,9 @@ namespace Terrain
 				}
 			}
 
-			frontTilemap = frontMap;
-			backTilemap = terrain;
+			mapBuffers[(int)ETerrainLayer.Front] = frontMap;
+			mapBuffers[(int)ETerrainLayer.Back] = terrain;
+			return mapBuffers;
 		}
 
 		int[,] generateTerrainSmoothPerlin(Vector2 positionOffset)

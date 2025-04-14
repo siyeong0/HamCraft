@@ -25,11 +25,22 @@ public class Player : MonoBehaviour
 	// Update is called once per frame
 	void Update()
 	{
-		// Stop player
-		if (Input.GetButtonUp("Horizontal"))
+		// block add/remove
+		if (Input.GetMouseButtonDown(0))
 		{
-			mRigidBody.linearVelocityX = 0f;
+			Vector3 mouseScreenPos = Input.mousePosition;
+			Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(mouseScreenPos);
+
+			World.AddBlockAt(1, mouseWorldPos, Terrain.ETerrainLayer.Front);
 		}
+		else if (Input.GetMouseButtonDown(1))
+		{
+			Vector3 mouseScreenPos = Input.mousePosition;
+			Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(mouseScreenPos);
+
+			World.RemoveBlockAt(mouseWorldPos, Terrain.ETerrainLayer.Front);
+		}
+
 
 		// Jumping
 		if (!mbJumping && mbOnGround && Input.GetButtonDown("Jump"))

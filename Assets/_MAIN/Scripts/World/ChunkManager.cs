@@ -2,7 +2,7 @@ using UnityEngine;
 
 using Terrain;
 using System.Collections.Generic;
-using Unity.VisualScripting;
+using UnityEngine.Assertions;
 using System.Linq;
 using UnityEngine.Tilemaps;
 
@@ -18,6 +18,7 @@ public class ChunkManager : MonoBehaviour
 
 	[SerializeField] TileBase[] tiles;
 
+	Grid mGrid;
 	TerrainGenerator mTerrainGenerator;
 
 	GameObject mFrontTilemapObject;
@@ -28,7 +29,6 @@ public class ChunkManager : MonoBehaviour
 	Dictionary<Vector2Int, Chunk> mChunks;
 	Vector2Int mCurrPivotChunk;
 	bool mbUpdateChunk;
-	Vector2Int CENTER_INDEX;
 
 	void Awake()
 	{
@@ -44,6 +44,9 @@ public class ChunkManager : MonoBehaviour
 	}
 	void Start()
 	{
+		mGrid = GetComponent<Grid>();
+		mTerrainGenerator = GetComponent<TerrainGenerator>();
+
 		GameObject chunk = Instantiate(chunkPrefab);
 		mFrontTilemapObject = chunk.transform.GetChild(1).gameObject;
 		mBackTilemapObject = chunk.transform.GetChild(0).gameObject;
@@ -54,7 +57,6 @@ public class ChunkManager : MonoBehaviour
 		mFrontTilemap = mFrontTilemapObject.GetComponent<Tilemap>();
 		mBackTilemap = mBackTilemapObject.GetComponent<Tilemap>();
 
-		mTerrainGenerator = GetComponent<TerrainGenerator>();
 		mChunks = new Dictionary<Vector2Int, Chunk>();
 		mCurrPivotChunk = CvtWorld2ChunkCoord(pivot.position);
 		mbUpdateChunk = true;
@@ -102,10 +104,32 @@ public class ChunkManager : MonoBehaviour
 			//BoundsInt compressBound = mBackTilemap.cellBounds;
 			//Debug.Log($"Default Bound: {defaultBound} Compress Bound :  {compressBound}");
 		}
+
+		for (int i = 0; i < mChunks.Count; ++i)
+		{
+			Chunk chunk = mChunks.ElementAt(i).Value;
+			if (chunk.IsDirty())
+			{
+				chunk.Draw(mFrontTilemap, mBackTilemap, tiles);
+			}
+		}
+
 		Vector2Int pivotChunk = CvtWorld2ChunkCoord(pivot.position);
 		mbUpdateChunk = pivotChunk != mCurrPivotChunk;
 		mCurrPivotChunk = pivotChunk;
 	}
+
+	public Chunk GetChunk(Vector2Int chunkIdx)
+	{
+		Assert.IsTrue(mChunks.ContainsKey(chunkIdx));
+		return mChunks[chunkIdx];
+	}
+
+	public Vector2 GetGridCellSize()
+	{
+		return mGrid.cellSize;
+	}
+
 
 	public Vector2Int CvtWorld2ChunkCoord(Vector2 position)
 	{
