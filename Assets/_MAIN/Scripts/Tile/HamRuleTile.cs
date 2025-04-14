@@ -1,8 +1,9 @@
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using static UnityEngine.RuleTile.TilingRuleOutput;
 
 [CreateAssetMenu(menuName = "2D/Tiles/Ham Rule Tile")]
-public class CustomRuleTile : RuleTile
+public class HamRuleTile : RuleTile
 {
 	public override bool RuleMatch(int neighbor, TileBase other)
 	{
@@ -12,9 +13,9 @@ public class CustomRuleTile : RuleTile
 		switch (neighbor)
 		{
 			case TilingRule.Neighbor.This:
-				return other is CustomRuleTile;
+				return other is HamRuleTile;
 			case TilingRule.Neighbor.NotThis:
-				return !(other is CustomRuleTile);
+				return !(other is HamRuleTile);
 			default:
 				break;
 		}

@@ -134,7 +134,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      Manganese Ore_0: -8849802171630030439
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

@@ -134,7 +134,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      saltedcookedmeat_0: -4476837633436622063
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

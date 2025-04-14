@@ -134,7 +134,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      jerky_0: -1942370242016616133
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

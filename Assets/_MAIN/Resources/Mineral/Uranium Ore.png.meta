@@ -134,7 +134,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      Uranium Ore_0: -4184570970447139829
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

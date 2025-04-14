@@ -134,7 +134,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      rottenmeat_0: -8571311720253138035
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

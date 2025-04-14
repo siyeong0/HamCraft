@@ -409,7 +409,19 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      whetstoneAnim_0: -3989517658186656904
+      whetstoneAnim_1: 2052187599130870392
+      whetstoneAnim_10: -3101769047842578993
+      whetstoneAnim_11: 2724156971619081680
+      whetstoneAnim_2: -4992525777609399786
+      whetstoneAnim_3: 5720591981929609461
+      whetstoneAnim_4: -253009458844508062
+      whetstoneAnim_5: 6892719947472451869
+      whetstoneAnim_6: 467250315791011127
+      whetstoneAnim_7: -221826466679159821
+      whetstoneAnim_8: -3728730877670365727
+      whetstoneAnim_9: -6485926289643414401
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
