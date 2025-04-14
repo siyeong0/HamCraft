@@ -30,6 +30,8 @@ public class RuleTileBuilder
 		textureImporter.isReadable = true;
 		textureImporter.textureType = TextureImporterType.Sprite;
 		textureImporter.spritePixelsPerUnit = 16;
+		textureImporter.filterMode = FilterMode.Point;
+		textureImporter.textureCompression = TextureImporterCompression.Uncompressed;
 		AssetDatabase.ImportAsset(assetPath, ImportAssetOptions.ForceUpdate);
 
 		Texture2D texture = AssetDatabase.LoadAssetAtPath<Texture2D>(assetPath);

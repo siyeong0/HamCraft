@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 4ff279ebe17109e4596bfbbd879bce38
+guid: dd879cee948ec224b88db15a4494a35b
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -6068788646303588056
-    second: Soil 2_0
+      213: 5090826596557361429
+    second: Soil 1_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -100,7 +100,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Soil 2_(0,0)
+      name: Soil 1_(0,0)
       rect:
         serializedVersion: 2
         x: 0
@@ -115,14 +115,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 9f3597c313cdf3648bb1dfa929e7f33e
-      internalID: 1334000670
+      spriteID: 29487e7d3aa58204797c2fb79576e463
+      internalID: -1305796637
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Soil 2_(0,1)
+      name: Soil 1_(0,1)
       rect:
         serializedVersion: 2
         x: 16
@@ -137,14 +137,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: a9688f7b2e09a7d4f89d92345607fa55
-      internalID: -1195332074
+      spriteID: 864a5158c99255844ac972da906aa109
+      internalID: -470680855
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Soil 2_(0,2)
+      name: Soil 1_(0,2)
       rect:
         serializedVersion: 2
         x: 32
@@ -159,14 +159,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 2c18b8b027b2bec4dbc5e240697bd5e9
-      internalID: -1429148761
+      spriteID: cc771402e90c6ec4ca24f6e5d4ffcdbd
+      internalID: 760105139
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Soil 2_(0,3)
+      name: Soil 1_(0,3)
       rect:
         serializedVersion: 2
         x: 48
@@ -181,14 +181,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: fc942a8965b0d454fae199db1115ba72
-      internalID: -1517400969
+      spriteID: 713465c5a812ddc44830537c857187cb
+      internalID: -1474698163
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Soil 2_(0,4)
+      name: Soil 1_(0,4)
       rect:
         serializedVersion: 2
         x: 64
@@ -203,14 +203,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 936f1a9bbc2de7a4b8301e9c6559e09b
-      internalID: 671514479
+      spriteID: 41aba6c5b3c529545a1cfc534f7c4f2a
+      internalID: 2043705066
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Soil 2_(0,5)
+      name: Soil 1_(0,5)
       rect:
         serializedVersion: 2
         x: 80
@@ -225,14 +225,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: b19ebb48734a5714ca12f251a48a0e2b
-      internalID: -1376732322
+      spriteID: 3e287fae8fa7b6742a6c6ca8b9bdd16c
+      internalID: 1591408262
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Soil 2_(0,6)
+      name: Soil 1_(0,6)
       rect:
         serializedVersion: 2
         x: 96
@@ -247,14 +247,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: de48dd74606c50d43af38c7c2f3a6c8e
-      internalID: 765084178
+      spriteID: cb3ddbebd90709a4bb08cd89d73a5c19
+      internalID: 1159418835
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Soil 2_(0,7)
+      name: Soil 1_(0,7)
       rect:
         serializedVersion: 2
         x: 112
@@ -269,14 +269,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 8926d2ac167c27b4f972ad49329cc638
-      internalID: 196884593
+      spriteID: 3a0fa2d37792e2140bc3f4d7a33f8a6e
+      internalID: 1124147066
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Soil 2_(0,8)
+      name: Soil 1_(0,8)
       rect:
         serializedVersion: 2
         x: 128
@@ -291,14 +291,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 46784775cf28da140b48bb992a28014e
-      internalID: 881803194
+      spriteID: 0641e12a7cf69444db8fd8781cd5718d
+      internalID: 1655716815
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Soil 2_(0,9)
+      name: Soil 1_(0,9)
       rect:
         serializedVersion: 2
         x: 144
@@ -313,14 +313,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 7f2e2b3007c6ee948b2e6a0474fef984
-      internalID: -1069138788
+      spriteID: 2fd177543f8b8ae49b714a7f15f0375d
+      internalID: -1298324227
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Soil 2_(0,10)
+      name: Soil 1_(0,10)
       rect:
         serializedVersion: 2
         x: 160
@@ -335,14 +335,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 5f497119600ffc94590c235184e2acf3
-      internalID: -1781915314
+      spriteID: 0239083ef8c33f54991016f7db568f85
+      internalID: -908115057
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Soil 2_(0,11)
+      name: Soil 1_(0,11)
       rect:
         serializedVersion: 2
         x: 176
@@ -357,14 +357,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: f237751206c6c4e45ba5eb245ccad85f
-      internalID: 84203183
+      spriteID: f4c39e4557a04c644a3d4a2f3f376c51
+      internalID: -1861851167
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Soil 2_(12,0)
+      name: Soil 1_(12,0)
       rect:
         serializedVersion: 2
         x: 0
@@ -379,14 +379,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 02a586bf80f73be4a8346a20d74ecf6c
-      internalID: 1417535079
+      spriteID: ff22e463b7faa6e4590e942e4b4eb898
+      internalID: -887104787
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Soil 2_(12,1)
+      name: Soil 1_(12,1)
       rect:
         serializedVersion: 2
         x: 16
@@ -401,14 +401,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 4ac651690aade0e4ba1844cfce39f881
-      internalID: -1146833937
+      spriteID: a444c1d67cb57494e8b0af663cf9fe70
+      internalID: -1067731392
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Soil 2_(12,2)
+      name: Soil 1_(12,2)
       rect:
         serializedVersion: 2
         x: 32
@@ -423,14 +423,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: c25d00687111fb6439a5dc39a1aa88a5
-      internalID: -231492842
+      spriteID: 6c28d78282014714ab93a07d5796eebc
+      internalID: 1978051889
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Soil 2_(12,3)
+      name: Soil 1_(12,3)
       rect:
         serializedVersion: 2
         x: 48
@@ -445,14 +445,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: cd0b70c7330e4b84495e7d66aeadab1e
-      internalID: 1050668977
+      spriteID: d4f0e504481d25e438ee50594a080d63
+      internalID: 2011397926
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Soil 2_(12,4)
+      name: Soil 1_(12,4)
       rect:
         serializedVersion: 2
         x: 64
@@ -467,14 +467,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 17733bc7a96ada748a7d752965e2b064
-      internalID: 415239137
+      spriteID: dc2eb3de566620442926320e3de5612a
+      internalID: 713768677
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Soil 2_(12,5)
+      name: Soil 1_(12,5)
       rect:
         serializedVersion: 2
         x: 80
@@ -489,14 +489,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 62067b71e23be2342ac70bb44da1c4d9
-      internalID: 948169518
+      spriteID: 7b4bcfcf94087144e912548d77a2d833
+      internalID: -565865149
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Soil 2_(12,6)
+      name: Soil 1_(12,6)
       rect:
         serializedVersion: 2
         x: 96
@@ -511,14 +511,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 3dcfb9b0be1f7344db4cd5dc9fbd98dd
-      internalID: -1684917212
+      spriteID: 922e0f3586be07e4d9ab479ae28b614c
+      internalID: 551628762
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Soil 2_(12,7)
+      name: Soil 1_(12,7)
       rect:
         serializedVersion: 2
         x: 112
@@ -533,14 +533,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 88156df23d7bde14ea3685ee04a2613e
-      internalID: -472277411
+      spriteID: a83c4c9f52f99154882afa41f25318fd
+      internalID: 925174264
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Soil 2_(12,8)
+      name: Soil 1_(12,8)
       rect:
         serializedVersion: 2
         x: 128
@@ -555,14 +555,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 6a1795012db516c45b0efb009282c83f
-      internalID: -521010100
+      spriteID: bedce25b612f7c644b9a9a10bd680741
+      internalID: -1030444154
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Soil 2_(12,9)
+      name: Soil 1_(12,9)
       rect:
         serializedVersion: 2
         x: 144
@@ -577,14 +577,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: aa1e83c24b21f394daa1237b550e2365
-      internalID: -104024126
+      spriteID: 7eacc4796794dc546b2ae86d382cbf39
+      internalID: 621126992
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Soil 2_(12,10)
+      name: Soil 1_(12,10)
       rect:
         serializedVersion: 2
         x: 160
@@ -599,14 +599,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 951af655b93f82847a4de50b1127c7ca
-      internalID: -1553014596
+      spriteID: 5d63b1bae5cf59d47b404b17680582c7
+      internalID: 1721056738
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Soil 2_(12,11)
+      name: Soil 1_(12,11)
       rect:
         serializedVersion: 2
         x: 176
@@ -621,14 +621,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 3d9db5b0473c4fa4a93d237e70bb3337
-      internalID: 1641209310
+      spriteID: 3e8334ec04c7a214da5ef243140a3dc3
+      internalID: -1718659713
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Soil 2_(24,0)
+      name: Soil 1_(24,0)
       rect:
         serializedVersion: 2
         x: 0
@@ -643,14 +643,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: c02175a8a29e5064f94aba1f2dbf6978
-      internalID: -1878407297
+      spriteID: 9a3e0e5a27018af48a47fddecaf8c51e
+      internalID: 964400859
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Soil 2_(24,1)
+      name: Soil 1_(24,1)
       rect:
         serializedVersion: 2
         x: 16
@@ -665,14 +665,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: b8e3e7210d13cd14cbb5ca9f44655881
-      internalID: 2035794151
+      spriteID: 238d3664ef2e4d6488e7d1239a844a71
+      internalID: -1628995627
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Soil 2_(24,2)
+      name: Soil 1_(24,2)
       rect:
         serializedVersion: 2
         x: 32
@@ -687,14 +687,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 1127faa5fe88a61458ce22cc3bccc4c3
-      internalID: -743905936
+      spriteID: 0d3abd65215c54e458f2ba9bb2130ba2
+      internalID: -56261832
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Soil 2_(24,3)
+      name: Soil 1_(24,3)
       rect:
         serializedVersion: 2
         x: 48
@@ -709,14 +709,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 6f74f72bc973d924b8b27fa6ba7ddd70
-      internalID: 260931606
+      spriteID: f3e180b19a7d57642aff0c810b75b13d
+      internalID: -1922729856
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Soil 2_(24,4)
+      name: Soil 1_(24,4)
       rect:
         serializedVersion: 2
         x: 64
@@ -731,14 +731,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: f8de34120b11dc34497d34072eca2dee
-      internalID: 1229372549
+      spriteID: 617f0d55e87b3eb4fb231dfab25f5698
+      internalID: 819686536
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Soil 2_(24,5)
+      name: Soil 1_(24,5)
       rect:
         serializedVersion: 2
         x: 80
@@ -753,14 +753,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: cbe4b79fb581e8d47a977ad2653c505a
-      internalID: 996524042
+      spriteID: 9f031dc1992a1c44aa4806169e58262f
+      internalID: 1963229191
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Soil 2_(24,6)
+      name: Soil 1_(24,6)
       rect:
         serializedVersion: 2
         x: 96
@@ -775,14 +775,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: acbb1ab7e65b8804f84c4a4e9025271d
-      internalID: -288556898
+      spriteID: 0ef5c9a0a8bfb314a888719b010027cb
+      internalID: 2071935064
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Soil 2_(24,7)
+      name: Soil 1_(24,7)
       rect:
         serializedVersion: 2
         x: 112
@@ -797,14 +797,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 3ff3ed81c68da9d459a14df2924b12cf
-      internalID: -1527600565
+      spriteID: bf2c6d99ae3897d45840cb0fdd87a525
+      internalID: 908814873
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Soil 2_(24,8)
+      name: Soil 1_(24,8)
       rect:
         serializedVersion: 2
         x: 128
@@ -819,14 +819,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: a91acaabe2987324b82f95c91db81cca
-      internalID: 1122010058
+      spriteID: 8a82ffc17ee70f841bbc2a36c4ef57a0
+      internalID: 642712870
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Soil 2_(24,9)
+      name: Soil 1_(24,9)
       rect:
         serializedVersion: 2
         x: 144
@@ -841,14 +841,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 673a61878d3bf7f4e8a17afc7cd2fd7d
-      internalID: 699603751
+      spriteID: e65da866fab3910418995fe6b11b9081
+      internalID: -1653153905
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Soil 2_(24,10)
+      name: Soil 1_(24,10)
       rect:
         serializedVersion: 2
         x: 160
@@ -863,14 +863,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: bdf37f6a4c58cdf4db49d4342afcfabc
-      internalID: -549104488
+      spriteID: e2ec55dc27f8fec44b64c338285c4dfd
+      internalID: 1246308962
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Soil 2_(24,11)
+      name: Soil 1_(24,11)
       rect:
         serializedVersion: 2
         x: 176
@@ -885,14 +885,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: fdd88017f78ccb448a3c6f2168d4d141
-      internalID: -1918062718
+      spriteID: 8193d684a53493942beaf89f30bee96c
+      internalID: -40959317
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Soil 2_(36,0)
+      name: Soil 1_(36,0)
       rect:
         serializedVersion: 2
         x: 0
@@ -907,14 +907,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: ca2e6e8b26fe24a419656b7161c4892c
-      internalID: -660609411
+      spriteID: bbd8d57f19ef27a4bba0dd1b6e187ba5
+      internalID: -1105971153
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Soil 2_(36,1)
+      name: Soil 1_(36,1)
       rect:
         serializedVersion: 2
         x: 16
@@ -929,14 +929,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 42b79f71aa77bf34099b1a574e9d7ca8
-      internalID: 630623130
+      spriteID: 8e1be384c62baf24495820e113d9f8ff
+      internalID: 91960305
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Soil 2_(36,2)
+      name: Soil 1_(36,2)
       rect:
         serializedVersion: 2
         x: 32
@@ -951,14 +951,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: c001521b712917245ac3b21a7b87e33d
-      internalID: 1015363733
+      spriteID: 08c8b0a109286fc4881394c715f9b0ea
+      internalID: -1176198615
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Soil 2_(36,3)
+      name: Soil 1_(36,3)
       rect:
         serializedVersion: 2
         x: 48
@@ -973,14 +973,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 01f43c1db2cb14f43b27212d825b2529
-      internalID: -824240588
+      spriteID: 668732de7ea429a46935140580b3aee3
+      internalID: 357072207
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Soil 2_(36,4)
+      name: Soil 1_(36,4)
       rect:
         serializedVersion: 2
         x: 64
@@ -995,14 +995,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: da62b317d69cb6d45b729f7bf5d463fd
-      internalID: 2122458674
+      spriteID: 8824c2d000291b84892a4c0612d18409
+      internalID: 1118159409
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Soil 2_(36,5)
+      name: Soil 1_(36,5)
       rect:
         serializedVersion: 2
         x: 80
@@ -1017,14 +1017,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 3b81f6c7e37445347bd19a0039d7aba6
-      internalID: 1605530025
+      spriteID: ae4ed23f420620344b7068c081709d9c
+      internalID: 1280524650
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Soil 2_(36,6)
+      name: Soil 1_(36,6)
       rect:
         serializedVersion: 2
         x: 96
@@ -1039,14 +1039,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: da860ae1e0d73814cacb93dc2f89641d
-      internalID: 1938544185
+      spriteID: 6eeb9c8e098ef274aa7cd6bc2a4bcb4a
+      internalID: 219309758
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Soil 2_(36,7)
+      name: Soil 1_(36,7)
       rect:
         serializedVersion: 2
         x: 112
@@ -1061,14 +1061,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 51852fab87d48d945ba3c54fb09eec84
-      internalID: -1653984661
+      spriteID: a49b65f0e609fbb459499ae3d3a6c702
+      internalID: 1606833832
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Soil 2_(36,8)
+      name: Soil 1_(36,8)
       rect:
         serializedVersion: 2
         x: 128
@@ -1083,14 +1083,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 0d219c446cb22a44493b93ce837a7317
-      internalID: 668325754
+      spriteID: 1bd36f4400d910d4792b739379f9c12a
+      internalID: -1223295391
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Soil 2_(36,9)
+      name: Soil 1_(36,9)
       rect:
         serializedVersion: 2
         x: 144
@@ -1105,14 +1105,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: fd38cb276459923429cfb5f77b19dcf5
-      internalID: 1011084944
+      spriteID: a2b5bb77cb11b834bbf208c53e83158e
+      internalID: 40642298
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Soil 2_(36,10)
+      name: Soil 1_(36,10)
       rect:
         serializedVersion: 2
         x: 160
@@ -1127,14 +1127,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: e8a38d8bc1afefd4c92e2c99d5e24f35
-      internalID: 1886793723
+      spriteID: 9d65cfab64e2d6340922e62d1e913789
+      internalID: -173178134
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Soil 2_(36,11)
+      name: Soil 1_(36,11)
       rect:
         serializedVersion: 2
         x: 176
@@ -1149,8 +1149,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: df3eef1d29e30d34d8b8ecc9d8b02605
-      internalID: -756057641
+      spriteID: c0e295e27646b1248a74ae7491778cf0
+      internalID: 1945661234
       vertices: []
       indices: 
       edges: []
@@ -1159,7 +1159,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 234bea642d1082b4b9bef3b1cb7d3d04
+    spriteID: 4de020cb1933ac943815812fbc2f42cc
     internalID: 0
     vertices: []
     indices: 
@@ -1169,7 +1169,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Soil 2_0: -6068788646303588056
+      Soil 1_0: 5090826596557361429
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

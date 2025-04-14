@@ -407,7 +407,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxSpeed: 7
-  jumpForce: 30
+  jumpForce: 10
 --- !u!1 &472050873
 GameObject:
   m_ObjectHideFlags: 0
@@ -439,13 +439,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   chunkPrefab: {fileID: 1677113315687972122, guid: 585dd2b41e592384ead8e8930d2f8b79, type: 3}
-  chunkSize: {x: 32, y: 32}
+  chunkSize: {x: 128, y: 32}
   pivot: {fileID: 519420032}
   simulateDepth: {x: 4, y: 4}
   tiles:
   - {fileID: 0}
-  - {fileID: 11400000, guid: 5b974cb72da799a49a63ab8f1ab524cf, type: 2}
-  - {fileID: 11400000, guid: 1bf8836baa87f274b994e3a7fd44c002, type: 2}
+  - {fileID: 11400000, guid: f063e93de001a2b4cac1921ddc2fb605, type: 2}
+  - {fileID: 11400000, guid: 916e4d1268a0cc94b940827323e45172, type: 2}
   smoothness: 64
   maxHeight: 40
   avgGrassHeight: 5
@@ -625,7 +625,7 @@ PositionConstraint:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 519420028}
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 2
   m_Weight: 1
   m_TranslationAtRest: {x: 0, y: 2.7, z: -10}
