@@ -439,10 +439,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: da6983591a23832449ff1d620eeb3065, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  chunkPrefab: {fileID: 1677113315687972122, guid: 585dd2b41e592384ead8e8930d2f8b79, type: 3}
-  chunkSize: {x: 64, y: 64}
   pivot: {fileID: 519420032}
-  simulateDepth: {x: 2, y: 2}
+  chunkPrefab: {fileID: 1677113315687972122, guid: 585dd2b41e592384ead8e8930d2f8b79, type: 3}
+  chunkSize: {x: 16, y: 16}
+  simulateDepth: {x: 4, y: 4}
+  updateBatchSize: 2
   tiles:
   - {fileID: 0}
   - {fileID: 11400000, guid: f063e93de001a2b4cac1921ddc2fb605, type: 2}

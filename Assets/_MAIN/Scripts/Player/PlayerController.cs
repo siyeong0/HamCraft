@@ -13,6 +13,7 @@ public class Player : MonoBehaviour
 	bool mbOnGround = false;
 	bool mbJumping = false;
 	bool mbFacingRight = true;
+	int mCraftingMode = 0;
 	// Start is called once before the first execution of Update after the MonoBehaviour is created
 	void Start()
 	{
@@ -26,19 +27,36 @@ public class Player : MonoBehaviour
 	void Update()
 	{
 		// block add/remove
-		if (Input.GetMouseButton(0))
+		if (Input.GetKeyDown(KeyCode.X))
 		{
-			Vector3 mouseScreenPos = Input.mousePosition;
-			Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(mouseScreenPos);
-
-			World.AddBlockAt(1, mouseWorldPos, Terrain.ETerrainLayer.Front);
+			mCraftingMode = (mCraftingMode + 1) % 2; // 0 : 부수기, 1 : 설치하기
 		}
-		else if (Input.GetMouseButton(1))
-		{
-			Vector3 mouseScreenPos = Input.mousePosition;
-			Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(mouseScreenPos);
 
-			World.RemoveBlockAt(mouseWorldPos, Terrain.ETerrainLayer.Front);
+		Vector3 mouseScreenPos = Input.mousePosition;
+		Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(mouseScreenPos);
+		if (Input.GetMouseButton(0)) // front layer
+		{
+			switch (mCraftingMode)
+			{
+				case 0: // 부수기
+					World.RemoveBlockAt(mouseWorldPos, Terrain.ETerrainLayer.Front);
+					break;
+				case 1: // 설치하기
+					World.AddBlockAt(1, mouseWorldPos, Terrain.ETerrainLayer.Front);
+					break;
+			}
+		}
+		else if (Input.GetMouseButton(1)) // back layer
+		{
+			switch (mCraftingMode)
+			{
+				case 0: // 부수기
+					World.RemoveBlockAt(mouseWorldPos, Terrain.ETerrainLayer.Back);
+					break;
+				case 1: // 설치하기
+					World.AddBlockAt(1, mouseWorldPos, Terrain.ETerrainLayer.Back);
+					break;
+			}
 		}
 
 

@@ -2,6 +2,8 @@ using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using System.Collections.Generic;
+using System.Collections;
+using System;
 
 namespace Terrain
 {
@@ -9,52 +11,92 @@ namespace Terrain
 	{
 		Vector2Int mChunkIdx;
 		Vector2 mChunkBasePosition;
-		List<int[,]> mMapBuffers;
-		bool mbDirty = false;
+		TileBase[] mTileBuffer;
+		TileBase[] mNullTileBuffer;
 
-		public Chunk(Vector2Int chunkIdx, TerrainGenerator terrainGenerator)
+		List<int[,]> mMapBuffers;
+		List<(int, Vector2Int, ETerrainLayer)> mUpdateList;
+
+		public Chunk(Vector2Int chunkIdx)
 		{
 			// chunk info
 			mChunkIdx = chunkIdx;
 			mChunkBasePosition = ChunkManager.Instance.CvtChunk2WorldBaseCoord(chunkIdx);
-			// allocate buffers
+
+			// init buffers
+			int width = ChunkManager.Instance.chunkSize.x;
+			int height = ChunkManager.Instance.chunkSize.y;
+
+			int batchSize = ChunkManager.Instance.updateBatchSize;
+			mTileBuffer = new TileBase[width * batchSize];
+			mNullTileBuffer = new TileBase[width * batchSize];
+
+			mUpdateList = new List<(int, Vector2Int, ETerrainLayer)>();
+
 			// generate terrain
-			Vector2 chunkBasePosition = ChunkManager.Instance.CvtChunk2WorldBaseCoord(chunkIdx);
-			mMapBuffers = terrainGenerator.Generate(chunkBasePosition);
+			mMapBuffers = ChunkManager.Instance.terrainGenerator.Generate(mChunkBasePosition);
 		}
 
-		public void Draw(Tilemap frontMap, Tilemap backMap, TileBase[] tiles)
+		public IEnumerator DrawCoroutine()
 		{
-			Assert.IsTrue(tiles[0] == null);
-			for (int x = 0; x < ChunkManager.Instance.chunkSize.x; ++x)
+			int width = ChunkManager.Instance.chunkSize.x;
+			int height = ChunkManager.Instance.chunkSize.y;
+			int batchSize = ChunkManager.Instance.updateBatchSize;
+			List<Tilemap> tilemapList = ChunkManager.Instance.tilemapList;
+			TileBase[] tiles = ChunkManager.Instance.tiles;
+
+			for (int layer = 0; layer < Enum.GetValues(typeof(ETerrainLayer)).Length; ++layer)
 			{
-				for (int y = 0; y < ChunkManager.Instance.chunkSize.y; ++y)
+				int[,] buffer = mMapBuffers[layer];
+				Tilemap tilemap = tilemapList[layer];
+				for (int e = 0; e < height / batchSize; ++e)
 				{
-					Vector3Int tilemapIdx = new Vector3Int(Mathf.FloorToInt(mChunkBasePosition.x + x), Mathf.FloorToInt(mChunkBasePosition.y + y), 0);
-					int[,] frontBuffer = mMapBuffers[(int)ETerrainLayer.Front];
-					frontMap.SetTile(tilemapIdx, tiles[frontBuffer[x, y]]);
-					int[,] backBuffer = mMapBuffers[(int)ETerrainLayer.Back];
-					backMap.SetTile(tilemapIdx, tiles[backBuffer[x, y]]);
+					for (int b = 0; b < batchSize; ++b)
+					{
+						int y = e * batchSize + b;
+						for (int x = 0; x < width; ++x)
+						{
+							mTileBuffer[b * width + x] = tiles[buffer[x, y]];
+						}
+					}
+					BoundsInt bound = new BoundsInt((int)mChunkBasePosition.x, (int)mChunkBasePosition.y + e * batchSize, 0, width, batchSize, 1);
+					tilemap.SetTilesBlock(bound, mTileBuffer);
+					yield return null;
 				}
 			}
 		}
 
-		public void Erase(Tilemap frontMap, Tilemap backMap)
+		public IEnumerator EraseCoroutine()
 		{
-			for (int x = 0; x < ChunkManager.Instance.chunkSize.x; ++x)
+			int width = ChunkManager.Instance.chunkSize.x;
+			int height = ChunkManager.Instance.chunkSize.y;
+			int batchSize = ChunkManager.Instance.updateBatchSize;
+			List<Tilemap> tilemapList = ChunkManager.Instance.tilemapList;
+
+			for (int layer = 0; layer < Enum.GetValues(typeof(ETerrainLayer)).Length; ++layer)
 			{
-				for (int y = 0; y < ChunkManager.Instance.chunkSize.y; ++y)
+				Tilemap tilemap = tilemapList[layer];
+				for (int e = 0; e < height / batchSize; ++e)
 				{
-					Vector3Int tilemapIdx = new Vector3Int(Mathf.FloorToInt(mChunkBasePosition.x + x), Mathf.FloorToInt(mChunkBasePosition.y + y), 0);
-					frontMap.SetTile(tilemapIdx, null);
-					backMap.SetTile(tilemapIdx, null);
+					BoundsInt bound = new BoundsInt((int)mChunkBasePosition.x, (int)mChunkBasePosition.y + e * batchSize, 0, width, batchSize, 1);
+					tilemap.SetTilesBlock(bound, mNullTileBuffer);
+					yield return null;
 				}
 			}
 		}
 
-		public bool IsDirty()
+		public void Update()
 		{
-			return mbDirty;
+			List<Tilemap> tilemapList = ChunkManager.Instance.tilemapList;
+			TileBase[] tiles = ChunkManager.Instance.tiles;
+
+			foreach ((int block, Vector2Int idx, ETerrainLayer layer) in mUpdateList)
+			{ 
+				Vector3Int tilemapIdx = new Vector3Int((int)(mChunkBasePosition.x) + idx.x, (int)(mChunkBasePosition.y) + idx.y, 0);
+				tilemapList[(int)layer].SetTile(tilemapIdx, tiles[block]);
+			}
+
+			mUpdateList.Clear();
 		}
 
 		public int GetBlockAt(int x, int y, ETerrainLayer layer)
@@ -70,7 +112,7 @@ namespace Terrain
 			if (bAdded)
 			{
 				mMapBuffers[(int)layer][x, y] = block;
-				mbDirty = true;
+				mUpdateList.Add((block, new Vector2Int(x, y), layer));
 			}
 			return bAdded;
 		}
@@ -82,7 +124,7 @@ namespace Terrain
 			if (bRemoved)
 			{
 				mMapBuffers[(int)layer][x, y] = 0;
-				mbDirty = true;
+				mUpdateList.Add((0, new Vector2Int(x, y), layer));
 			}
 			return bRemoved;
 		}
@@ -91,14 +133,14 @@ namespace Terrain
 		{
 			Assert.IsTrue(x >= 0 && x < ChunkManager.Instance.chunkSize.x && y >= 0 && y < ChunkManager.Instance.chunkSize.y);
 			mMapBuffers[(int)layer][x, y] = block;
-			mbDirty = true;
+			mUpdateList.Add((block, new Vector2Int(x, y), layer));
 		}
 
 		public Vector2Int GetBlockIdx(Vector2 position)
 		{
 			Vector2 cellSize = ChunkManager.Instance.GetGridCellSize();
 			Vector2Int blockIdx = new Vector2Int(
-				Mathf.FloorToInt((position.x - mChunkBasePosition.x) / cellSize.x), 
+				Mathf.FloorToInt((position.x - mChunkBasePosition.x) / cellSize.x),
 				Mathf.FloorToInt((position.y - mChunkBasePosition.y) / cellSize.x));
 			return blockIdx;
 		}

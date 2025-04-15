@@ -5,26 +5,25 @@ using System.Collections.Generic;
 using UnityEngine.Assertions;
 using System.Linq;
 using UnityEngine.Tilemaps;
+using System.Diagnostics;
+using System;
 
 public class ChunkManager : MonoBehaviour
 {
 	public static ChunkManager Instance { get; private set; }
 
+	[SerializeField] Transform pivot;
 	[SerializeField] GameObject chunkPrefab;
 	[SerializeField] public Vector2Int chunkSize;
-
-	[SerializeField] Transform pivot;
 	[SerializeField] Vector2Int simulateDepth;
-
-	[SerializeField] TileBase[] tiles;
+	[SerializeField] public int updateBatchSize;
+	[SerializeField] public TileBase[] tiles;
 
 	Grid mGrid;
-	TerrainGenerator mTerrainGenerator;
+	public TerrainGenerator terrainGenerator { get; private set; }
 
-	GameObject mFrontTilemapObject;
-	GameObject mBackTilemapObject;
-	Tilemap mFrontTilemap;
-	Tilemap mBackTilemap;
+	public List<Tilemap> tilemapList { get; private set; }
+	public List<TilemapRenderer> tilemapRendererList { get; private set; }
 
 	Dictionary<Vector2Int, Chunk> mChunks;
 	Vector2Int mCurrPivotChunk;
@@ -45,28 +44,39 @@ public class ChunkManager : MonoBehaviour
 	void Start()
 	{
 		mGrid = GetComponent<Grid>();
-		mTerrainGenerator = GetComponent<TerrainGenerator>();
+		terrainGenerator = GetComponent<TerrainGenerator>();
 
+		// init tilemaps
 		GameObject chunk = Instantiate(chunkPrefab);
-		mFrontTilemapObject = chunk.transform.GetChild(1).gameObject;
-		mBackTilemapObject = chunk.transform.GetChild(0).gameObject;
-		mFrontTilemapObject.transform.SetParent(transform);
-		mBackTilemapObject.transform.SetParent(transform);
+		GameObject frontTilemapObject = chunk.transform.GetChild(1).gameObject;
+		GameObject backTilemapObject = chunk.transform.GetChild(0).gameObject;
+		frontTilemapObject.transform.SetParent(transform);
+		backTilemapObject.transform.SetParent(transform);
 		Destroy(chunk);
 
-		mFrontTilemap = mFrontTilemapObject.GetComponent<Tilemap>();
-		mBackTilemap = mBackTilemapObject.GetComponent<Tilemap>();
+		int numLayers = Enum.GetValues(typeof(ETerrainLayer)).Length;
+		tilemapList = new List<Tilemap>();
+		for (int i = 0; i < numLayers; ++i) tilemapList.Add(null);
+		tilemapList[(int)ETerrainLayer.Front] = frontTilemapObject.GetComponent<Tilemap>();
+		tilemapList[(int)ETerrainLayer.Back] = backTilemapObject.GetComponent<Tilemap>();
+		tilemapRendererList = new List<TilemapRenderer>();
+		for (int i = 0; i < numLayers; ++i) tilemapRendererList.Add(null);
+		tilemapRendererList[(int)ETerrainLayer.Front] = frontTilemapObject.GetComponent<TilemapRenderer>();
+		tilemapRendererList[(int)ETerrainLayer.Back] = backTilemapObject.GetComponent<TilemapRenderer>();
 
 		mChunks = new Dictionary<Vector2Int, Chunk>();
 		mCurrPivotChunk = CvtWorld2ChunkCoord(pivot.position);
 		mbUpdateChunk = true;
+
+		Assert.IsTrue(updateBatchSize >= 1);
+		Assert.IsTrue(chunkSize.y % updateBatchSize == 0);
+		Assert.IsTrue(tiles[0] == null);
 	}
 
 	void Update()
 	{
-		if (mbUpdateChunk)
+		if (mbUpdateChunk) // load/unload chunks
 		{
-			// update chunks
 			HashSet<Vector2Int> newChunkSet = new HashSet<Vector2Int>();
 
 			// load new chunk
@@ -79,8 +89,8 @@ public class ChunkManager : MonoBehaviour
 
 					if (!mChunks.ContainsKey(coord))
 					{
-						mChunks[coord] = new Chunk(coord, mTerrainGenerator);
-						mChunks[coord].Draw(mFrontTilemap, mBackTilemap, tiles);
+						mChunks[coord] = new Chunk(coord);
+						StartCoroutine(mChunks[coord].DrawCoroutine());
 					}
 				}
 			}
@@ -91,27 +101,23 @@ public class ChunkManager : MonoBehaviour
 			{
 				if (!newChunkSet.Contains(coord))
 				{
-					mChunks[coord].Erase(mFrontTilemap, mBackTilemap);
+					StartCoroutine(mChunks[coord].EraseCoroutine());
 					mChunks.Remove(coord);
 				}
 			}
 
 			// resize tilemaps
-			mFrontTilemap.CompressBounds();
-			mBackTilemap.CompressBounds();
-
-			//BoundsInt defaultBound = mFrontTilemap.cellBounds;
-			//BoundsInt compressBound = mBackTilemap.cellBounds;
-			//Debug.Log($"Default Bound: {defaultBound} Compress Bound :  {compressBound}");
+			foreach(var tilemap in tilemapList)
+			{
+				tilemap.CompressBounds();
+			}
 		}
 
+		// update chunks : add/remove
 		for (int i = 0; i < mChunks.Count; ++i)
 		{
 			Chunk chunk = mChunks.ElementAt(i).Value;
-			if (chunk.IsDirty())
-			{
-				chunk.Draw(mFrontTilemap, mBackTilemap, tiles);
-			}
+			chunk.Update();
 		}
 
 		Vector2Int pivotChunk = CvtWorld2ChunkCoord(pivot.position);
@@ -130,7 +136,6 @@ public class ChunkManager : MonoBehaviour
 		return mGrid.cellSize;
 	}
 
-
 	public Vector2Int CvtWorld2ChunkCoord(Vector2 position)
 	{
 		return new Vector2Int(
@@ -142,6 +147,7 @@ public class ChunkManager : MonoBehaviour
 	{
 		return chunkSize * (chunkIdx - new Vector2(0.5f, 0.5f)) + chunkSize / 2;
 	}
+
 	public Vector2 CvtChunk2WorldBaseCoord(Vector2Int chunkIdx)
 	{
 		return chunkSize * (chunkIdx - new Vector2(0.5f, 0.5f));
