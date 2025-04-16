@@ -7,6 +7,7 @@ using System.Linq;
 using System.Reflection;
 using NUnit.Framework;
 using UnityEngine.Rendering;
+using System.Xml.Linq;
 
 namespace LindenmayerSystem
 {
@@ -27,18 +28,6 @@ namespace LindenmayerSystem
 
 		public List<Token> Build(string axiom, List<(string, string)> ruleExprs, int iterations)
 		{
-			Console.Write($"variables : ");
-			foreach (var variable in variables) Console.Write(variable + ", ");
-			Console.WriteLine();
-			Console.Write($"constants : ");
-			foreach (var constant in constants) Console.Write(constant + ", ");
-			Console.WriteLine();
-			Console.WriteLine($"axiom : {axiom}");
-			Console.Write($"rules : ");
-			foreach (var ruleExpr in ruleExprs) Console.Write($"({ruleExpr.Item1} -> {ruleExpr.Item2}) ");
-			Console.WriteLine();
-			Console.WriteLine();
-
 			// parse rules
 			List<Rule> rules = new List<Rule>();
 			foreach (var ruleExpr in ruleExprs)
@@ -53,8 +42,6 @@ namespace LindenmayerSystem
 			List<Token> current = Tokenize(axiom);
 			for (int iter = 0; iter < iterations; iter++)
 			{
-				Console.Write($"iteration {iter} : ");
-				Print(current);
 				List<Token> next = new List<Token>();
 				while (current.Count > 0)
 				{
@@ -75,27 +62,26 @@ namespace LindenmayerSystem
 						if (bRuleMatch)
 						{
 							// replace parameters in successor
-							List<Token> successor = rule.Successor
-								.Select(token => token.Clone()).ToList(); ;
-							for (int pi = 0; pi < predecessor.Count; pi++)
+							List<Token> successor = rule.Successor.Select(token => token.Clone()).ToList(); ;
+							for (int si = 0; si < successor.Count; si++)
 							{
-								if (predecessor[pi].Args == null) continue;
-								for (int si = 0; si < successor.Count; si++)
+								if (successor[si].Args == null) continue;
+								for (int pi = 0; pi < predecessor.Count; pi++)
 								{
-									if (successor[si].Args != null)
+									if (predecessor[pi].Args == null) continue;
+									for (int pai = 0; pai < predecessor[pi].Args.Length; pai++)
 									{
+										string replacingPattern = @"(?<![a-zA-Z0-9_])" + predecessor[pi].Args[pai] + "(?![a-zA-Z0-9_])";
+										string replaceValue = current[pi].Args[pai];
 										for (int sai = 0; sai < successor[si].Args.Length; sai++)
 										{
-											for (int pai = 0; pai < predecessor[pi].Args.Length; pai++)
-											{
-												string replacingPattern = @"(?<![a-zA-Z0-9_])" + predecessor[pi].Args[pai] + "(?![a-zA-Z0-9_])";
-												string replacedArgExpr = Regex.Replace(successor[si].Args[sai], replacingPattern, current[pi].Args[pai]);
-												replacedArgExpr = evaluateExpression(replacedArgExpr);
-
-												successor[si].Args[sai] = replacedArgExpr;
-											}
+											successor[si].Args[sai] = Regex.Replace(successor[si].Args[sai], replacingPattern, replaceValue);
 										}
 									}
+								}
+								for (int sai = 0; sai < successor[si].Args.Length; sai++)
+								{
+									successor[si].Args[sai] = evaluateExpression(successor[si].Args[sai]);
 								}
 							}
 							// replace next with successor
@@ -113,43 +99,59 @@ namespace LindenmayerSystem
 				}
 				current = next;
 			}
+			//foreach (var token in current)
+			//{
+			//	if (token.Args != null)
+			//	{
+			//		for (int i = 0; i < token.Args.Length; i++)
+			//		{
+			//			token.Args[i] = evaluateExpression(token.Args[i]);
+			//		}
+			//	}
+			// }
 
-			Console.Write($"iteration {iterations} : ");
-			Print(current);
 			return current;
 		}
 
 		public void Execute(List<Token> tokens)
 		{
-			Console.WriteLine();
-			Console.WriteLine("Execute stack : ");
+			Type behaviorType = behavior.GetType();
+			MethodInfo initMethod = behaviorType.GetMethod("Init");
+			initMethod.Invoke(behavior, null);
+
 			foreach (var token in tokens)
 			{
 				string name = token.Name;
 				string[] argStrings = token.Args;
 
-				Type behaviorType = behavior.GetType();
 				if (name.Length == 1 && constants.Contains(name[0]))
 				{
 					MethodInfo method = behaviorType.GetMethod("ParseConstant");
 					method.Invoke(behavior, new object[] { name[0] });
 				}
-				else
+				else if (variables.Contains(name))
 				{
 					MethodInfo method = behaviorType.GetMethod(name);
-					ParameterInfo[] parameters = method.GetParameters();
-
-					object[] args = null;
-					if (argStrings != null)
+					if (method != null)
 					{
-						args = new object[parameters.Length];
-						for (int i = 0; i < parameters.Length; i++)
-						{
-							args[i] = Convert.ChangeType(argStrings[i], parameters[i].ParameterType);
-						}
-					}
+						ParameterInfo[] parameters = method.GetParameters();
 
-					method.Invoke(behavior, args);
+						object[] args = null;
+						if (argStrings != null)
+						{
+							args = new object[parameters.Length];
+							for (int i = 0; i < parameters.Length; i++)
+							{
+								args[i] = Convert.ChangeType(argStrings[i], parameters[i].ParameterType);
+							}
+						}
+
+						method.Invoke(behavior, args);
+					}
+				}
+				else
+				{
+					Assert.Fail(name + " is not a valid variable.");
 				}
 			}
 		}
@@ -222,7 +224,7 @@ namespace LindenmayerSystem
 					{
 						token.Name = variable;
 						token.Args = null;
-						remaining = input.Substring(token.Name.Length).Trim();
+						remaining = input;
 						return (token, remaining);
 					}
 				}
@@ -334,11 +336,11 @@ namespace LindenmayerSystem
 						{
 							Type paramType = parameters[i].ParameterType;
 							bool isNumericType =
-								paramType == typeof(byte)	|| paramType == typeof(sbyte)	||
-								paramType == typeof(short)	|| paramType == typeof(ushort)	||
-								paramType == typeof(int)	|| paramType == typeof(uint)	||
-								paramType == typeof(long)	|| paramType == typeof(ulong)	||
-								paramType == typeof(float)	|| paramType == typeof(double)	||
+								paramType == typeof(byte) || paramType == typeof(sbyte) ||
+								paramType == typeof(short) || paramType == typeof(ushort) ||
+								paramType == typeof(int) || paramType == typeof(uint) ||
+								paramType == typeof(long) || paramType == typeof(ulong) ||
+								paramType == typeof(float) || paramType == typeof(double) ||
 								paramType == typeof(decimal);
 							if (isNumericType)
 							{
