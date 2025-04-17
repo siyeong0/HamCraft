@@ -21,7 +21,7 @@ namespace Terrain
 
 		const int GRASS_DIFF = 2;
 		const int GRASS_SECTION_WIDTH = 5;
-		const float PERLINE_OFFSET = 5000f; // to avoid repeating patterns
+		const float PERLIN_OFFSET = 5000f; // to avoid repeating patterns
 		void Start()
 		{
 			width = ChunkManager.Instance.chunkSize.x;
@@ -44,7 +44,7 @@ namespace Terrain
 			{
 				for (int y = 0; y < height; ++y)
 				{
-					frontMap[x, y] = cave[x, y] == 0 ? 0 : terrain[x, y];
+					frontMap[x, y] = cave[x, y] == 1 ? 0 : terrain[x, y];
 				}
 			}
 
@@ -60,8 +60,8 @@ namespace Terrain
 			int[] heightMap = new int[width];
 			for (int x = 0; x < width; ++x)
 			{
-				int perlineHeight = Mathf.RoundToInt(Mathf.PerlinNoise((positionOffset.x + (float)(x + PERLINE_OFFSET)) / smoothness, seed) * maxHeight);
-				heightMap[x] = perlineHeight;
+				int perlinHeight = Mathf.RoundToInt(Mathf.PerlinNoise((positionOffset.x + (float)(x + PERLIN_OFFSET)) / smoothness, seed) * maxHeight);
+				heightMap[x] = perlinHeight;
 			}
 			// grass height map
 			int[] grassHeightMap = new int[width];
@@ -117,9 +117,9 @@ namespace Terrain
 				for (int y = 0; y < height; ++y)
 				{
 					int caveValue = Mathf.RoundToInt(Mathf.PerlinNoise(
-						((float)(x + PERLINE_OFFSET) + positionOffset.x) * modifier + seed,
-						((float)(y + PERLINE_OFFSET) + positionOffset.y) * modifier + seed));
-					map[x, y] = caveValue == 1 ? 0 : 1;
+						((float)(x + PERLIN_OFFSET) + positionOffset.x) * modifier + seed,
+						((float)(y + PERLIN_OFFSET) + positionOffset.y) * modifier + seed));
+					map[x, y] = caveValue;
 				}
 			}
 			return map;

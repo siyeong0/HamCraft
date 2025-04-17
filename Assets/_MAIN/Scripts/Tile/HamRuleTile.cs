@@ -8,7 +8,7 @@ public class HamRuleTile : RuleTile
 	{
 		if (other is RuleOverrideTile)
 			other = (other as RuleOverrideTile).m_InstanceTile;
-
+		
 		switch (neighbor)
 		{
 			case TilingRule.Neighbor.This:

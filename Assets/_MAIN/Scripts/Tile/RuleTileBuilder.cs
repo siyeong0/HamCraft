@@ -62,7 +62,7 @@ public class RuleTileBuilder
 		assetImporter.SaveAndReimport();
 		AssetDatabase.ImportAsset(assetPath, ImportAssetOptions.ForceUpdate);
 
-		// build rule tile
+		// laod sprites
 		Object[] assets = AssetDatabase.LoadAllAssetsAtPath(assetPath);
 
 		List<Sprite> sprites = new List<Sprite>();
@@ -80,6 +80,7 @@ public class RuleTileBuilder
 			return;
 		}
 
+		// build rule tile
 		HamRuleTile ruleTile = ScriptableObject.CreateInstance<HamRuleTile>();
 		ruleTile.m_DefaultSprite = sprites[0];
 

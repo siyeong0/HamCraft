@@ -442,11 +442,11 @@ MonoBehaviour:
   pivot: {fileID: 519420032}
   chunkPrefab: {fileID: 1677113315687972122, guid: 585dd2b41e592384ead8e8930d2f8b79, type: 3}
   chunkSize: {x: 16, y: 16}
-  simulateDepth: {x: 4, y: 4}
+  simulateDepth: {x: 8, y: 4}
   updateBatchSize: 2
   tiles:
   - {fileID: 0}
-  - {fileID: 11400000, guid: f063e93de001a2b4cac1921ddc2fb605, type: 2}
+  - {fileID: 11400000, guid: 4f7718e245c4e904aa11009b7e19a691, type: 2}
   - {fileID: 11400000, guid: 916e4d1268a0cc94b940827323e45172, type: 2}
 --- !u!4 &472050875
 Transform:
@@ -487,11 +487,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: be8737a36b41de743801231219310501, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  smoothness: 128
-  maxHeight: 32
+  smoothness: 36
+  maxHeight: 64
   avgGrassHeight: 5
   seed: 0
-  modifier: 0.246
+  modifier: 0.092
   smoothCount: 4
 --- !u!1 &519420028
 GameObject:
@@ -796,7 +796,7 @@ SpriteRenderer:
   m_Size: {x: 1, y: 1}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!4 &711701557
