@@ -1,12 +1,8 @@
 using UnityEngine;
 using UnityEditor;
-using UnityEngine.Tilemaps;
-using UnityEditor.Tilemaps;
 using System.IO;
 using System.Collections.Generic;
 using UnityEditor.U2D.Sprites;
-using Unity.VisualScripting;
-using System.Linq;
 
 public class RuleTileBuilder
 {
@@ -25,7 +21,6 @@ public class RuleTileBuilder
 			Debug.LogError("Selected file is not a valid texture.");
 			return;
 		}
-
 		textureImporter.spriteImportMode = SpriteImportMode.Multiple;
 		textureImporter.isReadable = true;
 		textureImporter.textureType = TextureImporterType.Sprite;
@@ -35,16 +30,14 @@ public class RuleTileBuilder
 		AssetDatabase.ImportAsset(assetPath, ImportAssetOptions.ForceUpdate);
 
 		Texture2D texture = AssetDatabase.LoadAssetAtPath<Texture2D>(assetPath);
+		// slice to tiles
 		int textureWidth = texture.width;
 		int textureHeight = texture.height;
-
-		// slice to tiles
 		int tileWidth = 16;
 		int tileHeight = 16;
 
 		var factory = new SpriteDataProviderFactories();
 		factory.Init();
-
 		var dataProvider = factory.GetSpriteEditorDataProviderFromObject(texture);
 		dataProvider.InitSpriteEditorDataProvider();
 
@@ -64,7 +57,6 @@ public class RuleTileBuilder
 		}
 		dataProvider.SetSpriteRects(spriteRects.ToArray());
 		dataProvider.Apply();
-
 		// refresh the asset database
 		var assetImporter = dataProvider.targetObject as AssetImporter;
 		assetImporter.SaveAndReimport();
