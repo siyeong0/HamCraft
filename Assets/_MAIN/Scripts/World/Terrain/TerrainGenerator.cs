@@ -1,8 +1,9 @@
-using System;
-using System.Collections.Generic;
 using UnityEngine;
 
-namespace Terrain
+using System;
+using System.Collections.Generic;
+
+namespace HamCraft
 {
 	public class TerrainGenerator : MonoBehaviour
 	{

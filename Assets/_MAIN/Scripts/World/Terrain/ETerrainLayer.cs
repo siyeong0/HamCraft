@@ -1,5 +1,5 @@
 ﻿
-namespace Terrain
+namespace HamCraft
 {
 	public enum ETerrainLayer : int
 	{

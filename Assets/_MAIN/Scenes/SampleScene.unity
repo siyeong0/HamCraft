@@ -444,7 +444,7 @@ MonoBehaviour:
   chunkSize: {x: 16, y: 16}
   simulateDepth: {x: 4, y: 4}
   updateChunkBatchSize: 2
-  updateBlockBatchSize: 4
+  updateBlockBatchSize: 1
   tiles:
   - {fileID: 0}
   - {fileID: 11400000, guid: 4f7718e245c4e904aa11009b7e19a691, type: 2}
@@ -671,7 +671,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!50 &711701554
 Rigidbody2D:
   serializedVersion: 5
@@ -1092,7 +1092,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1606473896
 Transform:
   m_ObjectHideFlags: 0

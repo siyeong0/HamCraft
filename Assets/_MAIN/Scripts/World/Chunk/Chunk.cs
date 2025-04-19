@@ -1,11 +1,12 @@
-using NUnit.Framework;
 using UnityEngine;
+using UnityEngine.Assertions;
 using UnityEngine.Tilemaps;
-using System.Collections.Generic;
-using System.Collections;
-using System;
 
-namespace Terrain
+using System;
+using System.Collections;
+using System.Collections.Generic;
+
+namespace HamCraft
 {
 	public class Chunk
 	{
@@ -43,7 +44,6 @@ namespace Terrain
 		{
 			int width = ChunkManager.Instance.chunkSize.x;
 			int height = ChunkManager.Instance.chunkSize.y;
-			int batchSize = ChunkManager.Instance.updateBlockBatchSize;
 			List<Tilemap> tilemapList = ChunkManager.Instance.tilemapList;
 			TileBase[] tiles = ChunkManager.Instance.tiles;
 
@@ -69,9 +69,7 @@ namespace Terrain
 		{
 			int width = ChunkManager.Instance.chunkSize.x;
 			int height = ChunkManager.Instance.chunkSize.y;
-			int batchSize = ChunkManager.Instance.updateBlockBatchSize;
 			List<Tilemap> tilemapList = ChunkManager.Instance.tilemapList;
-			TileBase[] tiles = ChunkManager.Instance.tiles;
 
 			TileBase[] tileBuffer = new TileBase[width * height];
 			for (int layer = 0; layer < Enum.GetValues(typeof(ETerrainLayer)).Length; ++layer)
@@ -87,6 +85,7 @@ namespace Terrain
 		{
 			yield return null;
 			if (mbCoroutineErase) yield break;
+
 			int width = ChunkManager.Instance.chunkSize.x;
 			int height = ChunkManager.Instance.chunkSize.y;
 			int batchSize = ChunkManager.Instance.updateBlockBatchSize;
@@ -120,6 +119,7 @@ namespace Terrain
 		{
 			mbCoroutineErase = true;
 			yield return null;
+
 			int width = ChunkManager.Instance.chunkSize.x;
 			int height = ChunkManager.Instance.chunkSize.y;
 			int batchSize = ChunkManager.Instance.updateBlockBatchSize;
