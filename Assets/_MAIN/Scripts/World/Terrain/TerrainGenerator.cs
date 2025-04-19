@@ -22,7 +22,7 @@ namespace Terrain
 		const int GRASS_DIFF = 2;
 		const int GRASS_SECTION_WIDTH = 5;
 		const float PERLIN_OFFSET = 5000f; // to avoid repeating patterns
-		void Start()
+		void Awake()
 		{
 			width = ChunkManager.Instance.chunkSize.x;
 			height = ChunkManager.Instance.chunkSize.y;

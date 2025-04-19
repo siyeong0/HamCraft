@@ -20,6 +20,14 @@ public class Plant : MonoBehaviour
 						"rot(3/(g+1))"),
 		};
 
+	//List<(string, string)> rules = new List<(string, string)>
+	//	{
+	//		("L(g)",		"fwd(1,1)" +
+	//						"[rot(randrange(-50,-40))L(g)]" +
+	//						"rot(randrange(40,50))L(g)"),
+	//		("fwd(a,b)",    "fwd(a,b)fwd(a,b)")
+	//	};
+
 	LSystem lsys;
 
 	int prevIterations;

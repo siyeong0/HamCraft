@@ -406,8 +406,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b0bd9379bcc1182479a1f408d6e9bc3c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxSpeed: 7
-  jumpForce: 10
+  maxSpeed: 22
+  jumpForce: 22
 --- !u!1 &472050873
 GameObject:
   m_ObjectHideFlags: 0
@@ -442,8 +442,9 @@ MonoBehaviour:
   pivot: {fileID: 519420032}
   chunkPrefab: {fileID: 1677113315687972122, guid: 585dd2b41e592384ead8e8930d2f8b79, type: 3}
   chunkSize: {x: 16, y: 16}
-  simulateDepth: {x: 8, y: 4}
-  updateBatchSize: 2
+  simulateDepth: {x: 4, y: 4}
+  updateChunkBatchSize: 2
+  updateBlockBatchSize: 4
   tiles:
   - {fileID: 0}
   - {fileID: 11400000, guid: 4f7718e245c4e904aa11009b7e19a691, type: 2}
@@ -600,7 +601,7 @@ Camera:
   far clip plane: 1000
   field of view: 34
   orthographic: 1
-  orthographic size: 7
+  orthographic size: 16
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -670,7 +671,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!50 &711701554
 Rigidbody2D:
   serializedVersion: 5
@@ -1091,7 +1092,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1606473896
 Transform:
   m_ObjectHideFlags: 0

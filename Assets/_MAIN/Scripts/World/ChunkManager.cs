@@ -7,6 +7,9 @@ using System.Linq;
 using UnityEngine.Tilemaps;
 using System.Diagnostics;
 using System;
+using System.Collections;
+using System.Drawing;
+using Container;
 
 public class ChunkManager : MonoBehaviour
 {
@@ -16,7 +19,8 @@ public class ChunkManager : MonoBehaviour
 	[SerializeField] GameObject chunkPrefab;
 	[SerializeField] public Vector2Int chunkSize;
 	[SerializeField] Vector2Int simulateDepth;
-	[SerializeField] public int updateBatchSize;
+	[SerializeField] public int updateChunkBatchSize;
+	[SerializeField] public int updateBlockBatchSize;
 	[SerializeField] public TileBase[] tiles;
 
 	Grid mGrid;
@@ -25,9 +29,12 @@ public class ChunkManager : MonoBehaviour
 	public List<Tilemap> tilemapList { get; private set; }
 	public List<TilemapRenderer> tilemapRendererList { get; private set; }
 
-	Dictionary<Vector2Int, Chunk> mChunks;
-	Vector2Int mCurrPivotChunk;
-	bool mbUpdateChunk;
+	Dictionary<Vector2Int, Chunk> mChunks = new Dictionary<Vector2Int, Chunk>();
+	Vector2Int mPrevPivotChunk;
+
+	ModifiableQueue<(Vector2Int, Chunk)> mLoadChunkQueue = new ModifiableQueue<(Vector2Int, Chunk)>();
+	ModifiableQueue<(Vector2Int, Chunk)> mFreeChunkQueue = new ModifiableQueue<(Vector2Int, Chunk)>();
+	bool mbCompressBound;
 
 	void Awake()
 	{
@@ -40,9 +47,7 @@ public class ChunkManager : MonoBehaviour
 			Destroy(gameObject);
 			return;
 		}
-	}
-	void Start()
-	{
+
 		mGrid = GetComponent<Grid>();
 		terrainGenerator = GetComponent<TerrainGenerator>();
 
@@ -64,67 +69,124 @@ public class ChunkManager : MonoBehaviour
 		tilemapRendererList[(int)ETerrainLayer.Front] = frontTilemapObject.GetComponent<TilemapRenderer>();
 		tilemapRendererList[(int)ETerrainLayer.Back] = backTilemapObject.GetComponent<TilemapRenderer>();
 
-		mChunks = new Dictionary<Vector2Int, Chunk>();
-		mCurrPivotChunk = CvtWorld2ChunkCoord(pivot.position);
-		mbUpdateChunk = true;
+		mPrevPivotChunk = CvtWorld2ChunkCoord(pivot.position);
 
-		Assert.IsTrue(updateBatchSize >= 1);
-		Assert.IsTrue(chunkSize.y % updateBatchSize == 0);
 		Assert.IsTrue(tiles[0] == null);
+	}
+
+	void Start()
+	{
+		// init world
+		for (int y = -simulateDepth.y; y <= simulateDepth.y; ++y)
+		{
+			for (int x = -simulateDepth.x; x <= simulateDepth.x; ++x)
+			{
+				Vector2Int coord = mPrevPivotChunk + new Vector2Int(x, y);
+				mChunks[coord] = new Chunk(coord);
+				IEnumerator routine = mChunks[coord].DrawCoroutine();
+				while (routine.MoveNext()) { }
+			}
+		}
 	}
 
 	void Update()
 	{
-		if (mbUpdateChunk) // load/unload chunks
+		// update chunks : add/remove
+		foreach (var chunk in mChunks.Values)
 		{
-			HashSet<Vector2Int> newChunkSet = new HashSet<Vector2Int>();
+			chunk.Update();
+		}
 
+		Vector2Int pivotChunk = CvtWorld2ChunkCoord(pivot.position);
+		if (pivotChunk != mPrevPivotChunk)
+		{
+			mPrevPivotChunk = pivotChunk;
+
+			HashSet<Vector2Int> newChunkSet = new HashSet<Vector2Int>();
 			// load new chunk
 			for (int y = -simulateDepth.y; y <= simulateDepth.y; ++y)
 			{
 				for (int x = -simulateDepth.x; x <= simulateDepth.x; ++x)
 				{
-					Vector2Int coord = mCurrPivotChunk + new Vector2Int(x, y);
+					Vector2Int coord = pivotChunk + new Vector2Int(x, y);
 					newChunkSet.Add(coord);
-
-					if (!mChunks.ContainsKey(coord))
-					{
-						mChunks[coord] = new Chunk(coord);
-						StartCoroutine(mChunks[coord].DrawCoroutine());
-					}
 				}
 			}
 
-			// unload old chunk
-			var keys = mChunks.Keys.ToList();
-			foreach (var coord in keys)
+			// add load chunk
+			foreach (var coord in newChunkSet.ToList())
+			{
+				if (!mChunks.ContainsKey(coord))
+				{
+					int removeIndex = mFreeChunkQueue.FindIndex(x => x.Item1 == coord);
+					if (removeIndex != -1)
+					{
+						mFreeChunkQueue.RemoveAt(removeIndex);
+					}
+					else if (mLoadChunkQueue.Exist(x => x.Item1 == coord))
+					{
+						goto LOAD_EXIT;
+					}
+					mChunks[coord] = new Chunk(coord);
+					mLoadChunkQueue.Enqueue((coord, mChunks[coord]));
+				LOAD_EXIT:;
+				}
+			}
+			// add free chunk
+			foreach (var coord in mChunks.Keys.ToList())
 			{
 				if (!newChunkSet.Contains(coord))
 				{
-					StartCoroutine(mChunks[coord].EraseCoroutine());
+					int removeIndex = mLoadChunkQueue.FindIndex(x => x.Item1 == coord);
+					if (removeIndex != -1)
+					{
+						mLoadChunkQueue.RemoveAt(removeIndex);
+					}
+					else if (mFreeChunkQueue.Exist(x => x.Item1 == coord))
+					{
+						goto FREE_EXIT;
+					}
+					mFreeChunkQueue.Enqueue((coord, mChunks[coord]));
 					mChunks.Remove(coord);
+				FREE_EXIT:;
 				}
 			}
 
-			// resize tilemaps
-			foreach(var tilemap in tilemapList)
+			return;
+		}
+
+		// process queries
+		if (mLoadChunkQueue.Count + mFreeChunkQueue.Count > 0)
+		{
+			int batchCount = 0;
+			while (mLoadChunkQueue.Count > 0 && batchCount < updateChunkBatchSize)
+			{
+				var (dummy, chunk) = mLoadChunkQueue.Dequeue();
+				StartCoroutine(chunk.DrawCoroutine());
+				++batchCount;
+			}
+			while (mFreeChunkQueue.Count > 0 && batchCount < updateChunkBatchSize)
+			{
+				var (dummy, chunk) = mFreeChunkQueue.Dequeue();
+				StartCoroutine(chunk.EraseCoroutine());
+				++batchCount;
+			}
+
+			mbCompressBound = ((mLoadChunkQueue.Count + mFreeChunkQueue.Count) == 0);
+			return;
+		}
+
+		// compress tilemap bounds
+		if (mbCompressBound)
+		{
+			foreach (var tilemap in tilemapList)
 			{
 				tilemap.CompressBounds();
 			}
+			mbCompressBound = false;
 		}
-
-		// update chunks : add/remove
-		for (int i = 0; i < mChunks.Count; ++i)
-		{
-			Chunk chunk = mChunks.ElementAt(i).Value;
-			chunk.Update();
-		}
-
-		Vector2Int pivotChunk = CvtWorld2ChunkCoord(pivot.position);
-		mbUpdateChunk = pivotChunk != mCurrPivotChunk;
-		mCurrPivotChunk = pivotChunk;
+		return;
 	}
-
 	public Chunk GetChunk(Vector2Int chunkIdx)
 	{
 		Assert.IsTrue(mChunks.ContainsKey(chunkIdx));
@@ -151,5 +213,15 @@ public class ChunkManager : MonoBehaviour
 	public Vector2 CvtChunk2WorldBaseCoord(Vector2Int chunkIdx)
 	{
 		return chunkSize * (chunkIdx - new Vector2(0.5f, 0.5f));
+	}
+
+	public Vector3Int CvtChunk2TilemapBaseCoord(Vector2Int chunkIdx)
+	{
+		Vector2 worldBaseCoord = CvtChunk2WorldBaseCoord(chunkIdx);
+		Vector3Int tilemapBaseCoord = new Vector3Int(
+			Mathf.FloorToInt(worldBaseCoord.x / mGrid.cellSize.x),
+			Mathf.FloorToInt(worldBaseCoord.y / mGrid.cellSize.y),
+			0);
+		return tilemapBaseCoord;
 	}
 }

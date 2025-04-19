@@ -41,8 +41,8 @@ namespace LindenmayerSystem.Behavior
 			LineRenderer lineRenderer = branch.AddComponent<LineRenderer>();
 			lineRenderer.positionCount = 2;
 			lineRenderer.material = new Material(Shader.Find("Sprites/Default"));
-			lineRenderer.startColor = Color.black;
-			lineRenderer.endColor = Color.green;
+			lineRenderer.startColor = Color.white;
+			lineRenderer.endColor = Color.white;
 			lineRenderer.startWidth = thickness;
 			lineRenderer.endWidth = thickness;
 			lineRenderer.sortingOrder = 10;
