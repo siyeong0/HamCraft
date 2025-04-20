@@ -159,7 +159,7 @@ MonoBehaviour:
   rules:
   - Key: L(g)
     Value: fwd(randrange(100/(g+1)-10, 100/(g+1)+10),5/(g+1))rot(3/(g+1))[rot(randrange(-25,-15))L(g+1)]rot(3/(g+1))[rot(randrange(15,25))L(g+1)]rot(3/(g+1))
-  iterations: 7
+  iterations: 12
 --- !u!4 &632027430
 Transform:
   m_ObjectHideFlags: 0

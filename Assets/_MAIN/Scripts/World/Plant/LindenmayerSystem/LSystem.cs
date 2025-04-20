@@ -125,7 +125,6 @@ namespace LindenmayerSystem
 					if (method != null)
 					{
 						ParameterInfo[] parameters = method.GetParameters();
-
 						object[] args = null;
 						if (argStrings != null)
 						{
@@ -135,7 +134,6 @@ namespace LindenmayerSystem
 								args[i] = Convert.ChangeType(argStrings[i], parameters[i].ParameterType);
 							}
 						}
-
 						method.Invoke(behavior, args);
 					}
 				}
