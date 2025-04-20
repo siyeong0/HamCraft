@@ -148,6 +148,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 70714819632ad424fa8ec990449b2540, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  axiom: L(0)
+  variables:
+  - L
+  - fwd
+  - rot
+  functions:
+  - randrange
+  constants: 5b005d00
+  rules:
+  - Key: L(g)
+    Value: fwd(randrange(100/(g+1)-10, 100/(g+1)+10),5/(g+1))rot(3/(g+1))[rot(randrange(-25,-15))L(g+1)]rot(3/(g+1))[rot(randrange(15,25))L(g+1)]rot(3/(g+1))
   iterations: 7
 --- !u!4 &632027430
 Transform:
@@ -256,55 +267,9 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &873719620
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 873719623}
-  - component: {fileID: 873719622}
-  m_Layer: 0
-  m_Name: Leaf
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 0
---- !u!114 &873719622
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 873719620}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 484c72358671c7c4e8760ecfbae8d84c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  iterations: 5
---- !u!4 &873719623
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 873719620}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 649531754}
   - {fileID: 632027430}
-  - {fileID: 873719623}

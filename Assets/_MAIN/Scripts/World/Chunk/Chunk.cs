@@ -106,7 +106,8 @@ namespace HamCraft
 							mTileBuffer[b * width + x] = tiles[buffer[x, y]];
 						}
 					}
-					BoundsInt bound = new BoundsInt((int)mChunkBasePosition.x, (int)mChunkBasePosition.y + e * batchSize, 0, width, batchSize, 1);
+					Vector3Int baseIdx = tilemap.WorldToCell(mChunkBasePosition);
+					BoundsInt bound = new BoundsInt(baseIdx.x, baseIdx.y + e * batchSize, baseIdx.z, width, batchSize, 1);
 					tilemap.SetTilesBlock(bound, mTileBuffer);
 					
 					yield return null;
@@ -130,7 +131,8 @@ namespace HamCraft
 				Tilemap tilemap = tilemapList[layer];
 				for (int e = 0; e < height / batchSize; ++e)
 				{
-					BoundsInt bound = new BoundsInt((int)mChunkBasePosition.x, (int)mChunkBasePosition.y + e * batchSize, 0, width, batchSize, 1);
+					Vector3Int baseIdx = tilemap.WorldToCell(mChunkBasePosition);
+					BoundsInt bound = new BoundsInt(baseIdx.x, baseIdx.y + e * batchSize, baseIdx.z, width, batchSize, 1);
 					tilemap.SetTilesBlock(bound, mNullTileBuffer);
 
 					yield return null;
