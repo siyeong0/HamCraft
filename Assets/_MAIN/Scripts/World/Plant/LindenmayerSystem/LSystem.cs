@@ -1,13 +1,13 @@
+using UnityEngine;
+using UnityEngine.Assertions;
+
 using System;
 using System.Collections.Generic;
-using UnityEngine;
-using System.Text.RegularExpressions;
 using System.Data;
 using System.Linq;
 using System.Reflection;
-using NUnit.Framework;
-using UnityEngine.Rendering;
-using System.Xml.Linq;
+using System.Text.RegularExpressions;
+
 
 namespace LindenmayerSystem
 {
@@ -99,16 +99,6 @@ namespace LindenmayerSystem
 				}
 				current = next;
 			}
-			//foreach (var token in current)
-			//{
-			//	if (token.Args != null)
-			//	{
-			//		for (int i = 0; i < token.Args.Length; i++)
-			//		{
-			//			token.Args[i] = evaluateExpression(token.Args[i]);
-			//		}
-			//	}
-			// }
 
 			return current;
 		}
@@ -151,7 +141,7 @@ namespace LindenmayerSystem
 				}
 				else
 				{
-					Assert.Fail(name + " is not a valid variable.");
+					Assert.IsTrue(false, name + " is not a valid variable.");
 				}
 			}
 		}

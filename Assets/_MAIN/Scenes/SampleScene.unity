@@ -443,7 +443,7 @@ MonoBehaviour:
   chunkPrefab: {fileID: 1677113315687972122, guid: 585dd2b41e592384ead8e8930d2f8b79, type: 3}
   chunkSize: {x: 16, y: 16}
   simulateDepth: {x: 4, y: 4}
-  updateChunkBatchSize: 2
+  updateChunkBatchSize: 1
   updateBlockBatchSize: 1
   tiles:
   - {fileID: 0}
