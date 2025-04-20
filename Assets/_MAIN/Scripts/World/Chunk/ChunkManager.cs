@@ -30,8 +30,8 @@ namespace HamCraft
 		Dictionary<Vector2Int, Chunk> mChunks = new Dictionary<Vector2Int, Chunk>();
 		Vector2Int mPrevPivotChunk;
 
-		ModifiableQueue<(Vector2Int, Chunk)> mLoadChunkQueue = new ModifiableQueue<(Vector2Int, Chunk)>();
-		ModifiableQueue<(Vector2Int, Chunk)> mFreeChunkQueue = new ModifiableQueue<(Vector2Int, Chunk)>();
+		ModifiablePriorityQueue<(Vector2Int, Chunk), Func<float>> mLoadChunkQueue = new ModifiablePriorityQueue<(Vector2Int, Chunk), Func<float>>();
+		ModifiablePriorityQueue<(Vector2Int, Chunk), Func<float>> mFreeChunkQueue = new ModifiablePriorityQueue<(Vector2Int, Chunk), Func<float>>();
 		bool mbCompressBound;
 
 		void Awake()
@@ -121,7 +121,8 @@ namespace HamCraft
 							goto LOAD_EXIT;
 						}
 						mChunks[coord] = new Chunk(coord);
-						mLoadChunkQueue.Enqueue((coord, mChunks[coord]));
+						Func<float> calcPriority = () => 100000f - Vector2.Distance(CvtChunk2WorldCoord(coord), pivot.position);
+						mLoadChunkQueue.Enqueue((coord, mChunks[coord]), calcPriority);
 					LOAD_EXIT:;
 					}
 				}
@@ -139,7 +140,8 @@ namespace HamCraft
 						{
 							goto FREE_EXIT;
 						}
-						mFreeChunkQueue.Enqueue((coord, mChunks[coord]));
+						Func<float> calcPriority = () => -100000f + Vector2.Distance(CvtChunk2WorldCoord(coord), pivot.position);
+						mFreeChunkQueue.Enqueue((coord, mChunks[coord]), calcPriority);
 						mChunks.Remove(coord);
 					FREE_EXIT:;
 					}
@@ -180,7 +182,6 @@ namespace HamCraft
 			}
 			return;
 		}
-
 		public Chunk GetChunk(Vector2Int chunkIdx)
 		{
 			Assert.IsTrue(mChunks.ContainsKey(chunkIdx));
