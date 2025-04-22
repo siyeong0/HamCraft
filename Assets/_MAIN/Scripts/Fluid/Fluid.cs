@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.InteropServices;
 using Unity.Mathematics;
 using UnityEngine;
 
@@ -6,15 +7,14 @@ namespace HamCraft
 {
 	public class Fluid : MonoBehaviour
 	{
-		[SerializeField] ComputeShader fluidShader;
-		[SerializeField] Material fluidMaterial;
+		[SerializeField] ComputeShader fluidSimShader;
+		[SerializeField] Material fluidMaterialShader;
 
-		[SerializeField] int MAX_PARCELS = 100000;
+		[SerializeField] int maxParcels = 100000;
 
-		ComputeBuffer devicePositionBuffer;
-		float2[] hostPositionBuffer;
-		ComputeBuffer deviceVelocityBuffer;
-		float2[] hostVelocityBuffer;
+		Parcel[] hostParcelBuffer;
+		ComputeBuffer deviceParcelBuffer;
+
 		ComputeBuffer argsBuffer;
 
 		Mesh mesh;
@@ -22,24 +22,24 @@ namespace HamCraft
 
 		void Start()
 		{
-			hostPositionBuffer = new float2[MAX_PARCELS];
-			hostVelocityBuffer = new float2[MAX_PARCELS];
-			for (int i = 0; i < MAX_PARCELS; i++)
+			Debug.Assert(Marshal.SizeOf<Parcel>() == sizeof(float) * 4, "Parcel struct size is not correct!");
+
+			// initialize the parcel data buffer
+			hostParcelBuffer = new Parcel[maxParcels];
+			for (int i = 0; i < maxParcels; i++)
 			{
-				hostPositionBuffer[i] = new float2(UnityEngine.Random.Range(-1f, 1f), UnityEngine.Random.Range(-1f, 1f));
-				hostVelocityBuffer[i] = new float2(UnityEngine.Random.Range(-1f, 1f), UnityEngine.Random.Range(-1f, 1f));
+				hostParcelBuffer[i].Position = new float2(UnityEngine.Random.Range(-1f, 1f), UnityEngine.Random.Range(-1f, 1f));
+				hostParcelBuffer[i].Velocity = new float2(UnityEngine.Random.Range(-1f, 1f), UnityEngine.Random.Range(-1f, 1f));
 			}
 
-			devicePositionBuffer = new ComputeBuffer(MAX_PARCELS, sizeof(float) * 2);
-			devicePositionBuffer.SetData(hostPositionBuffer);
-			deviceVelocityBuffer = new ComputeBuffer(MAX_PARCELS, sizeof(float) * 2);
-			deviceVelocityBuffer.SetData(hostVelocityBuffer);
+			deviceParcelBuffer = new ComputeBuffer(maxParcels, Marshal.SizeOf<Parcel>());
+			deviceParcelBuffer.SetData(hostParcelBuffer);
 
-			kernel = fluidShader.FindKernel("CSMain");
-			fluidShader.SetBuffer(kernel, "positionBuffer", devicePositionBuffer);
-			fluidShader.SetBuffer(kernel, "velocityBuffer", deviceVelocityBuffer);
+			// initialize shaders
+			kernel = fluidSimShader.FindKernel("CSMain");
+			fluidSimShader.SetBuffer(kernel, "parcelBuffer", deviceParcelBuffer);
 
-			fluidMaterial.SetBuffer("positions", devicePositionBuffer);
+			fluidMaterialShader.SetBuffer("parcelBuffer", deviceParcelBuffer);
 
 			mesh = new Mesh();
 			mesh.name = "FluidQuadMesh";
@@ -74,25 +74,24 @@ namespace HamCraft
 			mesh.RecalculateBounds();
 
 
-			uint[] args = new uint[5] { mesh.GetIndexCount(0), (uint)MAX_PARCELS, 0, 0, 0 };
+			uint[] args = new uint[5] { mesh.GetIndexCount(0), (uint)maxParcels, 0, 0, 0 };
 			argsBuffer = new ComputeBuffer(1, args.Length * sizeof(uint), ComputeBufferType.IndirectArguments);
 			argsBuffer.SetData(args);
 		}
 
 		private void Update()
 		{
-			fluidShader.SetFloat("deltaTime", Time.deltaTime);
-			fluidShader.Dispatch(kernel, Mathf.CeilToInt(MAX_PARCELS / 256f), 1, 1);
+			fluidSimShader.SetFloat("deltaTime", Time.deltaTime);
+			fluidSimShader.Dispatch(kernel, Mathf.CeilToInt(maxParcels / 256f), 1, 1);
 
-			Graphics.DrawMeshInstancedIndirect(mesh, 0, fluidMaterial, new Bounds(Vector3.zero, Vector3.one * 100f), argsBuffer);
+			Graphics.DrawMeshInstancedIndirect(mesh, 0, fluidMaterialShader, new Bounds(Vector3.zero, Vector3.one * 100f), argsBuffer);
 
-			devicePositionBuffer.GetData(hostPositionBuffer);
+			deviceParcelBuffer.GetData(hostParcelBuffer);
 		}
 
 		void OnDestroy()
 		{
-			devicePositionBuffer?.Release();
-			deviceVelocityBuffer?.Release();
+			deviceParcelBuffer?.Release();
 			argsBuffer?.Release();
 		}
 	}

@@ -285,10 +285,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a810a3709c0cc1e408ac7212e25b952e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fluidShader: {fileID: 7200000, guid: 7ae9de3b7f40cee4a81e722f37dde795, type: 3}
-  fluidMaterial: {fileID: 2100000, guid: 4f10cce14d2721449ba4d7acc22ea476, type: 2}
-  mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
-  MAX_PARCELS: 10000
+  fluidSimShader: {fileID: 7200000, guid: 7ae9de3b7f40cee4a81e722f37dde795, type: 3}
+  fluidMaterialShader: {fileID: 2100000, guid: 4f10cce14d2721449ba4d7acc22ea476, type: 2}
+  maxParcels: 100000
 --- !u!4 &2010010315
 Transform:
   m_ObjectHideFlags: 0

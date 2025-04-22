@@ -1,19 +1,22 @@
+#include "Common.hlsl"
+
 #pragma kernel CSMain
 
+static const float2 GRAVITY = float2(0.0, -9.8);
+
 float deltaTime;
-RWStructuredBuffer<float2> positionBuffer;
-RWStructuredBuffer<float2> velocityBuffer;
+RWStructuredBuffer<Parcel> parcelBuffer;
 
 [numthreads(256,1,1)]
 void CSMain (uint3 id : SV_DispatchThreadID)
 {
-    velocityBuffer[id.x].y -= 0.98 * deltaTime;
-    positionBuffer[id.x] += velocityBuffer[id.x] * deltaTime;
+    parcelBuffer[id.x].Velocity += GRAVITY * deltaTime;
+    parcelBuffer[id.x].Position += parcelBuffer[id.x].Velocity * deltaTime;
     
-    if (positionBuffer[id.x].y < -5)
+    // boundary conditions
+    if (parcelBuffer[id.x].Position.y < -5)
     {
-        velocityBuffer[id.x].y *= -0.5;
-        positionBuffer[id.x].y = -5;
-
+        parcelBuffer[id.x].Velocity.y *= -0.5;
+        parcelBuffer[id.x].Position.y = -5;
     }
 }
