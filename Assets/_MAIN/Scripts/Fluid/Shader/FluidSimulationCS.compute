@@ -1,0 +1,20 @@
+#include "Common.hlsl"
+
+#pragma kernel Solve
+
+float deltaTime;
+float radius;
+float mass;
+
+int numParcels;
+RWStructuredBuffer<Parcel> parcelBuffer;
+
+[numthreads(1024, 1, 1)]
+void Solve(uint3 id : SV_DispatchThreadID)
+{
+	if ((int) id.x >= numParcels)
+		return;
+	
+	// parcelBuffer[id.x].Position.x += deltaTime * 0.1;
+}
+

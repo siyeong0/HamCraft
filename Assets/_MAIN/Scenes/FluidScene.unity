@@ -267,7 +267,7 @@ GameObject:
   - component: {fileID: 2010010315}
   - component: {fileID: 2010010314}
   m_Layer: 0
-  m_Name: Fluid
+  m_Name: FluidSim
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -285,9 +285,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a810a3709c0cc1e408ac7212e25b952e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fluidSimShader: {fileID: 7200000, guid: 7ae9de3b7f40cee4a81e722f37dde795, type: 3}
+  numParcels: 400
+  interactionRadius: 1.2
+  mass: 0.1
+  targetDensity: 2.75
+  radius: 0.05
+  color: {r: 0, g: 0, b: 0, a: 1}
+  fluidComputeShader: {fileID: 7200000, guid: 7ae9de3b7f40cee4a81e722f37dde795, type: 3}
   fluidMaterialShader: {fileID: 2100000, guid: 4f10cce14d2721449ba4d7acc22ea476, type: 2}
-  maxParcels: 100000
+  visualizeDensityMaterialShader: {fileID: 2100000, guid: 3dec5552ce91dd8418a0de7283da6e78, type: 2}
+  positiveDensityColor: {r: 0.71599996, g: 0.26995897, b: 0.19833195, a: 1}
+  negativeDensityColor: {r: 0.12941177, g: 0.53333336, b: 0.6901961, a: 1}
+  zeroDensityColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!4 &2010010315
 Transform:
   m_ObjectHideFlags: 0

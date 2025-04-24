@@ -1,19 +1,14 @@
-Shader "Custom/FluidMS"
+Shader "Custom/ParcelRenderingMS"
 {
-    Properties
-    {
-        _Color ("Color", Color) = (1,1,1,1)
-        _Radius("Radius", Float) = 0.05
-    }
     SubShader
     {
-        Tags { "RenderType"="Opaque" "Queue"="Transparent" }
+        Tags { "RenderType"="Opaque" }
+        Blend SrcAlpha OneMinusSrcAlpha
+        Cull Off
+        ZWrite Off
+        ZTest LEqual
         PASS
         {
-            Blend SrcAlpha OneMinusSrcAlpha
-            ZWrite Off
-            Cull Off
-
             CGPROGRAM
             #pragma vertex vert;
             #pragma fragment frag;
@@ -21,8 +16,8 @@ Shader "Custom/FluidMS"
 
             #include "Common.hlsl"
             StructuredBuffer<Parcel> parcelBuffer;
-            float4 _Color;
-            float _Radius;
+            float radius;
+            float4 color;
 
             struct VertInput
             {
@@ -55,11 +50,11 @@ Shader "Custom/FluidMS"
 
                 float2 center = parcelBuffer[vertexData.instanceID].Position;
 
-                pos *= _Radius;
+                pos *= radius;
 
                 float2 worldPos = center + pos;
                 output.pos = UnityObjectToClipPos(float4(worldPos, 0, 1));
-                output.uv = pos / _Radius;
+                output.uv = pos / radius;
                 output.center = center;
 
                 return output;
@@ -69,10 +64,10 @@ Shader "Custom/FluidMS"
             {
                 float dist = length(input.uv);
 
-                float alpha = smoothstep(0.95, 1.0, dist);
+                float alpha = smoothstep(1.0, 1.0, dist);
                 alpha = 1.0 - alpha;
 
-                return _Color * alpha;
+                return color * alpha;
             }
             ENDCG
         }
