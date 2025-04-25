@@ -67,7 +67,7 @@ Shader "Custom/VisualizeIntensity"
                 for (int i = 0; i < numParcels; ++i)
                 {
                     float distance = length(samplePos - parcelBuffer[i].Position);
-                    float influence = smoothKernel(distance, smoothingRadius);
+                    float influence = spikyKernel(distance, smoothingRadius);
                     density += influence;
                 }
 

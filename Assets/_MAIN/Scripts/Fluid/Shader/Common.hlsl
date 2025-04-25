@@ -10,11 +10,20 @@ struct Parcel
     float2 Velocity;
 };
 
-float smoothKernel(float dist, float radius)
+float spikyKernel(float dist, float radius)
 {
-	float volume = PI * pow(radius, 8.0) / 4.0;
-	float value = max(0, radius * radius - dist * dist);
-	return value * value * value / volume;
+    if (dist > radius)
+        return 0.0;
+    float coeff = 15.0 / (PI * pow(radius, 6.0));
+    return coeff * pow(radius - dist, 3.0);
+}
+
+float2 spikyGradient(float2 vec, float dist, float radius)
+{
+    if (dist > radius || dist < 0.001f)
+        return float2(0.0, 0.0);
+    float coeff = -45.0 / (PI * pow(radius, 6.0));
+    return coeff * pow(radius - dist, 2.0) * (vec / (dist));
 }
 
 #endif

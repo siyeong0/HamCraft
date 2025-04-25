@@ -289,6 +289,7 @@ MonoBehaviour:
   interactionRadius: 1.2
   mass: 0.1
   targetDensity: 2.75
+  pressureCoefficient: 100
   radius: 0.05
   color: {r: 0, g: 0, b: 0, a: 1}
   fluidComputeShader: {fileID: 7200000, guid: 7ae9de3b7f40cee4a81e722f37dde795, type: 3}
@@ -297,6 +298,7 @@ MonoBehaviour:
   positiveDensityColor: {r: 0.71599996, g: 0.26995897, b: 0.19833195, a: 1}
   negativeDensityColor: {r: 0.12941177, g: 0.53333336, b: 0.6901961, a: 1}
   zeroDensityColor: {r: 1, g: 1, b: 1, a: 1}
+  forceColor: {r: 0.4716981, g: 0, b: 1, a: 1}
 --- !u!4 &2010010315
 Transform:
   m_ObjectHideFlags: 0
