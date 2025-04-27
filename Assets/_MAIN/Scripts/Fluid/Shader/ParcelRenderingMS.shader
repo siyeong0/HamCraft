@@ -29,12 +29,13 @@ Shader "Custom/ParcelRenderingMS"
                 AddressW = CLAMP;
             };
 
-            struct VertInput
+            struct appdata
             {
+                float4 vertex : POSITION;
                 uint vertexID : SV_VertexID;
             };
 
-            struct FragInput
+            struct v2f
             {
                 float4 pos : SV_POSITION;
                 float2 uv : TEXCOORD0;
@@ -42,29 +43,16 @@ Shader "Custom/ParcelRenderingMS"
                 float2 colorUV : TEXCOORD2;
             };
 
-            FragInput vert(VertInput vertexData, uint instanceID : SV_InstanceID)
+            v2f vert(appdata v, uint instanceID : SV_InstanceID)
             {
-                FragInput output;
+                v2f output;
 
-                float2 quad[6] = {
-                    float2(-1, -1), // 0
-                    float2( 1, -1), // 1
-                    float2(-1,  1), // 2
-
-                    float2(-1,  1), // 2
-                    float2( 1, -1), // 1
-                    float2( 1,  1)  // 3
-                };
-                // pos
-                float2 pos = quad[vertexData.vertexID] * radius;
+                float2 pos = v.vertex * radius;
                 float2 center = positionBuffer[instanceID];
                 float2 worldPos = center + pos;
                 output.pos = UnityObjectToClipPos(float4(worldPos, 0, 1));
-                // uv
-                output.uv = quad[vertexData.vertexID];
-                // center
+                output.uv = v.vertex;
                 output.center = center;
-                // color
                 float speed = length(velocityBuffer[instanceID]);
                 float speedT = saturate(speed / maxSpeed);
                 output.colorUV = float2(speedT, 0.5);
@@ -72,7 +60,7 @@ Shader "Custom/ParcelRenderingMS"
                 return output;
             }
 
-            half4 frag(FragInput input) : SV_Target
+            half4 frag(v2f input) : SV_Target
             {
                 float dist = length(input.uv);
                 float alpha = 1.0 - smoothstep(1.0, 1.0, dist);
