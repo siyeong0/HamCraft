@@ -18,8 +18,8 @@ namespace HamCraft
 		[System.Serializable]
 		class RulePair
 		{
-			public string Key;
-			public string Value;
+			public string Key = null!;
+			public string Value = null!;
 		}
 		[SerializeField] List<RulePair> rules;
 		[SerializeField] int iterations;

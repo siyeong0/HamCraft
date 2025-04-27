@@ -4,12 +4,6 @@
 static const float2 GRAVITY = float2(0.0, -9.8);
 static const float PI = 3.14159265358979323846;
 
-struct Parcel
-{
-    float2 Position;
-    float2 Velocity;
-};
-
 float spikyKernel(float dist, float radius)
 {
     if (dist > radius)

@@ -15,14 +15,23 @@ Shader "Custom/ParcelRenderingMS"
             #pragma multi_compile_instancing
 
             #include "Common.hlsl"
-            StructuredBuffer<Parcel> parcelBuffer;
+            StructuredBuffer<float2> positionBuffer;
+            StructuredBuffer<float2> velocityBuffer;
             float radius;
             float4 color;
+            float maxSpeed;
+            Texture2D speedColorMap;
+            SamplerState linear_clamp_sampler
+            {
+                Filter = MIN_MAG_MIP_LINEAR;
+                AddressU = CLAMP;
+                AddressV = CLAMP;
+                AddressW = CLAMP;
+            };
 
             struct VertInput
             {
                 uint vertexID : SV_VertexID;
-                uint instanceID : SV_InstanceID;
             };
 
             struct FragInput
@@ -30,9 +39,10 @@ Shader "Custom/ParcelRenderingMS"
                 float4 pos : SV_POSITION;
                 float2 uv : TEXCOORD0;
                 float2 center : TEXCOORD1;
+                float2 colorUV : TEXCOORD2;
             };
 
-            FragInput vert(VertInput vertexData)
+            FragInput vert(VertInput vertexData, uint instanceID : SV_InstanceID)
             {
                 FragInput output;
 
@@ -45,17 +55,19 @@ Shader "Custom/ParcelRenderingMS"
                     float2( 1, -1), // 1
                     float2( 1,  1)  // 3
                 };
-
-                float2 pos = quad[vertexData.vertexID];
-
-                float2 center = parcelBuffer[vertexData.instanceID].Position;
-
-                pos *= radius;
-
+                // pos
+                float2 pos = quad[vertexData.vertexID] * radius;
+                float2 center = positionBuffer[instanceID];
                 float2 worldPos = center + pos;
                 output.pos = UnityObjectToClipPos(float4(worldPos, 0, 1));
-                output.uv = pos / radius;
+                // uv
+                output.uv = quad[vertexData.vertexID];
+                // center
                 output.center = center;
+                // color
+                float speed = length(velocityBuffer[instanceID]);
+                float speedT = saturate(speed / maxSpeed);
+                output.colorUV = float2(speedT, 0.5);
 
                 return output;
             }
@@ -63,11 +75,9 @@ Shader "Custom/ParcelRenderingMS"
             half4 frag(FragInput input) : SV_Target
             {
                 float dist = length(input.uv);
-
-                float alpha = smoothstep(1.0, 1.0, dist);
-                alpha = 1.0 - alpha;
-
-                return color * alpha;
+                float alpha = 1.0 - smoothstep(1.0, 1.0, dist);
+                float3 speedColor = speedColorMap.Sample(linear_clamp_sampler, input.colorUV);
+                return float4(speedColor, alpha);
             }
             ENDCG
         }

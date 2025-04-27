@@ -14,7 +14,8 @@ Shader "Custom/VisualizeIntensity"
             #pragma fragment frag;
 
             #include "Common.hlsl"
-            StructuredBuffer<Parcel> parcelBuffer;
+            StructuredBuffer<float2> positionBuffer;
+            StructuredBuffer<float2> velocityBuffer;
             int numParcels;
             float smoothingRadius;
             float targetDensity;
@@ -66,13 +67,13 @@ Shader "Custom/VisualizeIntensity"
                 [loop]
                 for (int i = 0; i < numParcels; ++i)
                 {
-                    float distance = length(samplePos - parcelBuffer[i].Position);
+                    float distance = length(samplePos - positionBuffer[i]);
                     float influence = spikyKernel(distance, smoothingRadius);
                     density += influence;
                 }
 
                 // draw intensity
-                float intensity = (density - targetDensity) / targetDensity;
+                float intensity = (density - targetDensity) / targetDensity * 0.5;
                 if (intensity > 0)
                 {
                     float4 diff = positiveColor - zeroColor;
