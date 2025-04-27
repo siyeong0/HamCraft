@@ -1,4 +1,4 @@
-Shader "Custom/VisualizeIntensity"
+Shader "Custom/IntensityMS"
 {
     SubShader
     {
@@ -13,9 +13,8 @@ Shader "Custom/VisualizeIntensity"
             #pragma vertex vert;
             #pragma fragment frag;
 
-            #include "Common.hlsl"
+            #include "../ComputeShader/Common.hlsl"
             StructuredBuffer<float2> positionBuffer;
-            StructuredBuffer<float2> velocityBuffer;
             int numParcels;
             float smoothingRadius;
             float targetDensity;

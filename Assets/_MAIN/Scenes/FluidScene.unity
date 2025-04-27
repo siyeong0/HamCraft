@@ -285,55 +285,65 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a810a3709c0cc1e408ac7212e25b952e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  numParcels: 4000
-  interactionRadius: 0.35
-  targetDensity: 60
-  pressureCoefficient: 200
-  nearPressureCoefficient: 50
-  viscosityStrength: 0.075
-  gravity: 9
-  subStepCount: 1
-  radius: 0.05
-  color: {r: 1, g: 1, b: 1, a: 1}
-  fluidComputeShader: {fileID: 7200000, guid: 7ae9de3b7f40cee4a81e722f37dde795, type: 3}
-  fluidMaterialShader: {fileID: 2100000, guid: 4f10cce14d2721449ba4d7acc22ea476, type: 2}
-  controlRadius: 3
-  controlStregth: 35
-  drawDebug: 0
-  visualizeDensityMaterialShader: {fileID: 2100000, guid: 3dec5552ce91dd8418a0de7283da6e78, type: 2}
-  positiveDensityColor: {r: 0.71599996, g: 0.26995897, b: 0.19833195, a: 1}
-  negativeDensityColor: {r: 0.12941177, g: 0.53333336, b: 0.6901961, a: 1}
-  zeroDensityColor: {r: 1, g: 1, b: 1, a: 1}
-  speedColorMap:
-    serializedVersion: 2
-    key0: {r: 0.09199995, g: 0.24160798, b: 1, a: 1}
-    key1: {r: 0, g: 1, b: 0.5030501, a: 1}
-    key2: {r: 1, g: 0.9371229, b: 0, a: 0}
-    key3: {r: 0.84400004, g: 0, b: 0, a: 0}
-    key4: {r: 0, g: 0, b: 0, a: 0}
-    key5: {r: 0, g: 0, b: 0, a: 0}
-    key6: {r: 0, g: 0, b: 0, a: 0}
-    key7: {r: 0, g: 0, b: 0, a: 0}
-    ctime0: 0
-    ctime1: 32189
-    ctime2: 45682
-    ctime3: 65535
-    ctime4: 0
-    ctime5: 0
-    ctime6: 0
-    ctime7: 0
-    atime0: 0
-    atime1: 65535
-    atime2: 0
-    atime3: 0
-    atime4: 0
-    atime5: 0
-    atime6: 0
-    atime7: 0
-    m_Mode: 0
-    m_ColorSpace: -1
-    m_NumColorKeys: 4
-    m_NumAlphaKeys: 2
+  simulation:
+    simulationComputeShader: {fileID: 7200000, guid: 7ae9de3b7f40cee4a81e722f37dde795, type: 3}
+    numParcels: 4000
+    interactionRadius: 0.35
+    targetDensity: 60
+    pressureCoefficient: 150
+    nearPressureCoefficient: 50
+    viscosityStrength: 0.1
+    gravity: 9
+    subStepCout: 1
+    controlRadius: 3
+    controlStregth: 35
+    solveKernel: 0
+    hostPositionBuffer: []
+    hostVelocityBuffer: []
+    hostPredictedPositionBuffer: []
+    hostDensityBuffer: []
+    halfSize: {x: 0, y: 0}
+  rendering:
+    rid: 1434706066982043753
+  references:
+    version: 2
+    RefIds:
+    - rid: 1434706066982043753
+      type: {class: FluidSpeedRenderer, ns: HamCraft, asm: Assembly-CSharp}
+      data:
+        material: {fileID: 2100000, guid: 4f10cce14d2721449ba4d7acc22ea476, type: 2}
+        circleRadius: 0.05
+        maxSpeed: 4
+        speedColorMap:
+          serializedVersion: 2
+          key0: {r: 0, g: 0, b: 1, a: 1}
+          key1: {r: 0.32, g: 1, b: 0.57, a: 1}
+          key2: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+          key3: {r: 1, g: 0, b: 0, a: 1}
+          key4: {r: 0, g: 0, b: 0, a: 0}
+          key5: {r: 0, g: 0, b: 0, a: 0}
+          key6: {r: 0, g: 0, b: 0, a: 0}
+          key7: {r: 0, g: 0, b: 0, a: 0}
+          ctime0: 0
+          ctime1: 32768
+          ctime2: 42598
+          ctime3: 65535
+          ctime4: 0
+          ctime5: 0
+          ctime6: 0
+          ctime7: 0
+          atime0: 65535
+          atime1: 65535
+          atime2: 65535
+          atime3: 65535
+          atime4: 0
+          atime5: 0
+          atime6: 0
+          atime7: 0
+          m_Mode: 0
+          m_ColorSpace: -1
+          m_NumColorKeys: 4
+          m_NumAlphaKeys: 4
 --- !u!4 &2010010315
 Transform:
   m_ObjectHideFlags: 0
