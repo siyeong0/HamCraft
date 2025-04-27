@@ -14,7 +14,6 @@ Shader "Custom/ParcelRenderingMS"
             #pragma fragment frag;
             #pragma multi_compile_instancing
 
-            #include "Common.hlsl"
             StructuredBuffer<float2> positionBuffer;
             StructuredBuffer<float2> velocityBuffer;
             float radius;
