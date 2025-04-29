@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Unity.Assertions;
 using Unity.Mathematics;
 
 namespace HamCraft
@@ -51,6 +50,33 @@ namespace HamCraft
 			startIndices = new int[maxPoints];
 		}
 
+		public void UpdateSpatialLookup(float2[] points, float radius)
+		{
+			this.points = points;
+			this.radius = radius;
+
+			Parallel.For(0, points.Length, i =>
+			{
+				(int cellX, int cellY) = cvtPositionToCellCoord(points[i], radius);
+				uint cellKey = getKeyFromHash(hashCellPos(cellX, cellY));
+				spatialLookup[i] = new Entry() { Key = cellKey, Index = i };
+				startIndices[i] = int.MaxValue;
+			});
+
+			// Array.Sort(spatialLookup);
+			BitonicSort.Sort(spatialLookup);
+
+			Parallel.For(0, points.Length, i =>
+			{
+				uint key = spatialLookup[i].Key;
+				uint prevKey = i == 0 ? uint.MaxValue : spatialLookup[i - 1].Key;
+				if (key != prevKey)
+				{
+					startIndices[key] = i;
+				}
+			});
+		}
+
 		public void ForeachPointWithinRadius(float2 samplePoint, Action<int> callback)
 		{
 			(int centerX, int centerY) = cvtPositionToCellCoord(samplePoint, radius);
@@ -98,33 +124,6 @@ namespace HamCraft
 			}
 
 			return neighbors;
-		}
-
-		public void UpdateSpatialLookup(float2[] points, float radius)
-		{
-			this.points = points;
-			this.radius = radius;
-
-			Parallel.For(0, points.Length, i =>
-			{
-				(int cellX, int cellY) = cvtPositionToCellCoord(points[i], radius);
-				uint cellKey = getKeyFromHash(hashCellPos(cellX, cellY));
-				spatialLookup[i] = new Entry() { Key = cellKey, Index = i };
-				startIndices[i] = int.MaxValue;
-			});
-
-			// Array.Sort(spatialLookup);
-			BitonicSort.Sort(spatialLookup);
-
-			Parallel.For(0, points.Length, i =>
-			{
-				uint key = spatialLookup[i].Key;
-				uint prevKey = i == 0 ? uint.MaxValue : spatialLookup[i - 1].Key;
-				if (key != prevKey)
-				{
-					startIndices[key] = i;
-				}
-			});
 		}
 
 		(int, int) cvtPositionToCellCoord(float2 position, float radius)

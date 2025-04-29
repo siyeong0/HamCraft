@@ -1,15 +1,16 @@
 using Unity.Entities.UniversalDelegates;
 using UnityEngine;
 using UnityEngine.Assertions;
+using UnityEngine.Rendering;
 
 namespace HamCraft
 {
 	public class Fluid : MonoBehaviour
 	{
-		[SerializeField] FluidSimulation simulation;
+		[SerializeField] FluidSimulationGPU simulation;
+		[Space(10)]
 		[SerializeReference, SubclassPicker] IFluidRenderer rendering;
-
-		private void Start() 
+		private void Awake() 
 		{
 			// init sim
 			simulation.Initialize();
@@ -21,6 +22,14 @@ namespace HamCraft
 		private void Update()
 		{
 			rendering.Draw();
+
+			if (Input.GetKeyDown(KeyCode.Escape))
+			{
+				simulation.CleanUp();
+				rendering.CleanUp();
+				simulation.Initialize();
+				rendering.Initialize(simulation);
+			}
 		}
 
 		private void FixedUpdate()

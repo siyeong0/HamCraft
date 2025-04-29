@@ -4,17 +4,22 @@ namespace HamCraft
 {
 	public class FluidIntensityRenderer : IFluidRenderer
 	{
-		[SerializeReference] FluidCircleRenderer fluidCircleRenderer;
+		[SerializeReference, SubclassPicker] FluidCircleRenderer fluidCircleRenderer;
 		public Color positiveIntensityColor = new Color(0.83f, 0.3f, 0.2f);
 		public Color negativeIntensityColor = new Color(0.13f, 0.53f, 0.7f);
 		public Color zeroIntensityColor = Color.white;
 
-		public override void Initialize(FluidSimulation sim)
+		public override void Initialize(FluidSimulationGPU sim)
 		{
 			this.sim = sim;
 			material.SetBuffer("positionBuffer", sim.devicePositionBuffer);
 			material.SetBuffer("velocityBuffer", sim.deviceVelocityBuffer);
 
+			if (fluidCircleRenderer == null)
+			{
+				fluidCircleRenderer = new FluidCircleRenderer();
+				fluidCircleRenderer.material = Resources.Load<Material>("Fluid/FluidCircelMaterial");
+			}
 			fluidCircleRenderer.Initialize(sim);
 		}
 

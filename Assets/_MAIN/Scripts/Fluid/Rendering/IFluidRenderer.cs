@@ -6,9 +6,8 @@ namespace HamCraft
 	{
 		public Material material;
 
-		protected FluidSimulation sim;
-
-		public virtual void Initialize(FluidSimulation sim)
+		protected FluidSimulationGPU sim;
+		public virtual void Initialize(FluidSimulationGPU sim)
 		{
 			this.sim = sim;
 		}

@@ -15,7 +15,7 @@ namespace HamCraft
 		ComputeBuffer argsBuffer;
 		Mesh mesh;
 
-		public override void Initialize(FluidSimulation sim)
+		public override void Initialize(FluidSimulationGPU sim)
 		{
 			this.sim = sim;
 			material.SetBuffer("positionBuffer", sim.devicePositionBuffer);

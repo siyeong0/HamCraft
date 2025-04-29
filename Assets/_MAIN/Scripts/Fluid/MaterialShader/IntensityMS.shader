@@ -13,7 +13,7 @@ Shader "Custom/IntensityMS"
             #pragma vertex vert;
             #pragma fragment frag;
 
-            #include "../ComputeShader/Common.hlsl"
+            #include "../ComputeShader/FluidMath.hlsl"
             StructuredBuffer<float2> positionBuffer;
             int numParcels;
             float smoothingRadius;
@@ -67,7 +67,7 @@ Shader "Custom/IntensityMS"
                 for (int i = 0; i < numParcels; ++i)
                 {
                     float distance = length(samplePos - positionBuffer[i]);
-                    float influence = spikyKernel(distance, smoothingRadius);
+                    float influence = spikyPow2Kernel(distance, smoothingRadius);
                     density += influence;
                 }
 

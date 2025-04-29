@@ -1,18 +1,319 @@
-#include "Common.hlsl"
+#include "FluidMath.hlsl"
+#include "SpatialGrid.hlsl"
 
-#pragma kernel Solve
+#pragma kernel ApplyExternalForces
+#pragma kernel UpdateSpatialEntries
+#pragma kernel UpdateSpatialOffsets
+#pragma kernel Sort
+#pragma kernel UpdateDensities
+#pragma kernel ApplyPressureForces
+#pragma kernel ApplyViscocityForces
+#pragma kernel UpdatePositions;
 
 float deltaTime;
-float radius;
+float predictDeltaTime;
 
-int numParcels;
+float interactionRadius;
+float targetDensity;
+float pressureStiffness;
+float nearPressureStiffness;
+float viscosityStrength;
+float collisionDamping;
+float2 gravity;
+float4 bounds;
+
+float inputControlRadius;
+float2 inputPosition;
+float inputStrength;
+
+uint numParcels;
 RWStructuredBuffer<float2> positionBuffer;
+RWStructuredBuffer<float2> predictedPositionBuffer;
 RWStructuredBuffer<float2> velocityBuffer;
+RWStructuredBuffer<float2> densityBuffer;
 
-[numthreads(1024, 1, 1)]
-void Solve(uint3 id : SV_DispatchThreadID)
+uint numEntries;
+RWStructuredBuffer<uint3> spatialEntryBuffer; // (index, hash, key)
+RWStructuredBuffer<uint> spatialOffsetBuffer;
+
+float calcPressureFormDensity(float density)
 {
-	if ((int) id.x >= numParcels)
-		return;
+	return pressureStiffness * (density - targetDensity);
 }
 
+float calcNearPressureFormDensity(float nearDensity)
+{
+	return nearPressureStiffness * nearDensity;
+}
+
+[numthreads(1024, 1, 1)]
+void ApplyExternalForces(uint3 id : SV_DispatchThreadID)
+{
+	if (id.x >= numParcels)
+		return;
+	
+	// calc external forces
+	float2 externalForce = gravity;
+	if (inputStrength != 0)
+	{
+		float2 offset = inputPosition - positionBuffer[id.x];
+		float dist = length(offset);
+		if (dist < inputControlRadius && dist > EPSILON)
+		{
+			float2 dir = offset / dist;
+			float centerT = 1.0f - dist / inputControlRadius;
+			float gravityWeight = 1 - (centerT * saturate(inputStrength / 10));
+			
+			externalForce = gravity * gravityWeight + centerT * (dir * inputStrength - velocityBuffer[id.x]);
+		}
+	}
+	
+	// apply external force
+	velocityBuffer[id.x] += externalForce * deltaTime;
+	// update predcited position
+	predictedPositionBuffer[id.x] = positionBuffer[id.x] + velocityBuffer[id.x] * predictDeltaTime;
+}
+
+[numthreads(1024, 1, 1)]
+void UpdateSpatialEntries(uint3 id : SV_DispatchThreadID)
+{
+	if (id.x >= numParcels)
+		return;
+	
+	spatialOffsetBuffer[id.x] = numEntries;
+	
+	uint index = id.x;
+	int2 cellPos = getCellCoordFromPosition(predictedPositionBuffer[id.x], interactionRadius);
+	uint hash = getHashFromCellPos(cellPos);
+	uint key = getKeyFromHash(hash, numEntries);
+	spatialEntryBuffer[id.x] = uint3(index, hash, key);
+}
+
+const uint k;
+const uint j;
+
+[numthreads(256, 1, 1)]
+void Sort(uint3 id : SV_DispatchThreadID)
+{
+	uint i = id.x;
+	
+	uint l = i ^ j;
+	if (l > i)
+	{
+		if (((i & k) == 0) && (spatialEntryBuffer[i].z > spatialEntryBuffer[l].z) ||
+			((i & k) != 0) && (spatialEntryBuffer[i].z < spatialEntryBuffer[l].z))
+		{
+			uint3 t = spatialEntryBuffer[i];
+			spatialEntryBuffer[i] = spatialEntryBuffer[l];
+			spatialEntryBuffer[l] = t;
+		}
+
+	}
+}
+
+[numthreads(1024, 1, 1)]
+void UpdateSpatialOffsets(uint3 id : SV_DispatchThreadID)
+{
+	if (id.x >= numParcels)
+		return;
+
+	uint i = id.x;
+	uint null = numEntries;
+
+	uint key = spatialEntryBuffer[i].z;
+	uint keyPrev = i == 0 ? null : spatialEntryBuffer[i - 1].z;
+
+	if (key != keyPrev)
+	{
+		spatialOffsetBuffer[key] = i;
+	}
+}
+
+[numthreads(1024, 1, 1)]
+void UpdateDensities(uint3 id : SV_DispatchThreadID)
+{
+	if (id.x >= numParcels)
+		return;
+	
+	float2 originPos = predictedPositionBuffer[id.x];
+	int2 originCell = getCellCoordFromPosition(originPos, interactionRadius);
+	
+	float sqrRadius = interactionRadius * interactionRadius;
+	
+	float density = 0.0;
+	float nearDensity = 0.0;
+	for (int i = 0; i < 9; ++i)
+	{
+		uint hash = getHashFromCellPos(originCell + SPATIAL_OFFSETS[i]);
+		uint key = getKeyFromHash(hash, numEntries);
+		uint currIndex = spatialOffsetBuffer[key];
+		
+		while (currIndex < numParcels)
+		{
+			uint3 indexData = spatialEntryBuffer[currIndex++];
+			if (indexData.z != key)
+				break;
+			if (indexData.y != hash)
+				continue;
+			
+			uint neighborIndex = indexData.x;
+			float2 neighborPos = predictedPositionBuffer[neighborIndex];
+			float2 offsetToNeighbor = neighborPos - originPos;
+			float sqrDistToNeighbor = dot(offsetToNeighbor, offsetToNeighbor);
+			
+			if (sqrDistToNeighbor > sqrRadius)
+				continue;
+
+			float dist = sqrt(sqrDistToNeighbor);
+			density += spikyPow2Kernel(dist, interactionRadius);
+			nearDensity += spikyPow3Kernel(dist, interactionRadius);
+		}
+	}
+	densityBuffer[id.x] = float2(density, nearDensity);
+}
+
+[numthreads(1024, 1, 1)]
+void ApplyPressureForces(uint3 id : SV_DispatchThreadID)
+{
+	if (id.x >= numParcels)
+		return;
+	
+	// calc pressure force
+	float2 pressureForce = float2(0.0, 0.0);
+
+	float2 originPos = predictedPositionBuffer[id.x];
+	int2 originCell = getCellCoordFromPosition(originPos, interactionRadius);
+	
+	float sqrRadius = interactionRadius * interactionRadius;
+	
+	float densityA = densityBuffer[id.x].x;
+	float pressureA = calcPressureFormDensity(densityA);
+	float nearDensityA = densityBuffer[id.x].y;
+	float nearPressureA = calcNearPressureFormDensity(nearDensityA);
+	for (int i = 0; i < 9; ++i)
+	{
+		uint hash = getHashFromCellPos(originCell + SPATIAL_OFFSETS[i]);
+		uint key = getKeyFromHash(hash, numEntries);
+		uint currIndex = spatialOffsetBuffer[key];
+		
+		while (currIndex < numParcels)
+		{
+			uint3 indexData = spatialEntryBuffer[currIndex++];
+			if (indexData.z != key)
+				break;
+			if (indexData.y != hash)
+				continue;
+			
+			uint neighborIndex = indexData.x;
+			if (neighborIndex == id.x)
+				continue;
+			
+			float2 neighborPos = predictedPositionBuffer[neighborIndex];
+			float2 offsetToNeighbor = originPos - neighborPos;
+			float sqrDistToNeighbor = dot(offsetToNeighbor, offsetToNeighbor);
+			
+			if (sqrDistToNeighbor > sqrRadius)
+				continue;
+
+			float dist = sqrt(sqrDistToNeighbor);
+
+			float densityB = densityBuffer[neighborIndex].x;
+			float pressureB = calcPressureFormDensity(densityB);
+			float nearDensityB = densityBuffer[neighborIndex].y;
+			float nearPressureB = calcNearPressureFormDensity(nearDensityB);
+
+			float pressureTerm = -(pressureA + pressureB) / (2.0 * densityB);
+			float nearPressureTerm = -(nearPressureA + nearPressureB) / (2.0 * nearDensityB);
+			pressureForce += pressureTerm * spikyPow2Gradient(offsetToNeighbor, dist, interactionRadius);
+			pressureForce += nearPressureTerm * spikyPow3Gradient(offsetToNeighbor, dist, interactionRadius);
+		}
+	}
+	pressureForce /= densityA;
+	
+	// apply pressure force
+	velocityBuffer[id.x] += pressureForce * deltaTime;
+}
+
+[numthreads(1024, 1, 1)]
+void ApplyViscocityForces(uint3 id : SV_DispatchThreadID)
+{
+	if (id.x >= numParcels)
+		return;
+	
+	// calc viscosity force
+	float2 viscosityForce = float2(0.0, 0.0);
+
+	float2 originPos = predictedPositionBuffer[id.x];
+	int2 originCell = getCellCoordFromPosition(originPos, interactionRadius);
+	
+	float sqrRadius = interactionRadius * interactionRadius;
+	
+	for (int i = 0; i < 9; ++i)
+	{
+		uint hash = getHashFromCellPos(originCell + SPATIAL_OFFSETS[i]);
+		uint key = getKeyFromHash(hash, numEntries);
+		uint currIndex = spatialOffsetBuffer[key];
+		
+		while (currIndex < numParcels)
+		{
+			uint3 indexData = spatialEntryBuffer[currIndex++];
+			if (indexData.z != key)
+				break;
+			if (indexData.y != hash)
+				continue;
+			
+			uint neighborIndex = indexData.x;
+			if (neighborIndex == id.x)
+				continue;
+			
+			float2 neighborPos = predictedPositionBuffer[neighborIndex];
+			float2 offsetToNeighbor = originPos - neighborPos;
+			float sqrDistToNeighbor = dot(offsetToNeighbor, offsetToNeighbor);
+			
+			if (sqrDistToNeighbor > sqrRadius)
+				continue;
+
+			float dist = sqrt(sqrDistToNeighbor);
+			float influence = smoothingPoly6Kernel(dist, interactionRadius);
+			viscosityForce += influence * (velocityBuffer[neighborIndex] - velocityBuffer[id.x]);
+		}
+	}
+	viscosityForce *= viscosityStrength;
+	
+	// apply viscosity force
+	velocityBuffer[id.x] += viscosityForce * deltaTime;
+}
+
+[numthreads(1024, 1, 1)]
+void UpdatePositions(uint3 id : SV_DispatchThreadID)
+{
+	if (id.x >= numParcels)
+		return;
+	
+	// update positions
+	positionBuffer[id.x] += velocityBuffer[id.x] * deltaTime;
+	
+	// handle collision
+	float2 boundsMin = float2(bounds.x, bounds.y);
+	float2 boundsMax = float2(bounds.z, bounds.w);
+	if (positionBuffer[id.x].x > boundsMax.x)
+	{
+		positionBuffer[id.x].x = boundsMax.x;
+		velocityBuffer[id.x].x *= -1 * collisionDamping;
+	}
+	else if (positionBuffer[id.x].x < boundsMin.x)
+	{
+		positionBuffer[id.x].x = boundsMin.x;
+		velocityBuffer[id.x].x *= -1 * collisionDamping;
+	}
+	if (positionBuffer[id.x].y > boundsMax.y)
+	{
+		positionBuffer[id.x].y = boundsMax.y;
+		velocityBuffer[id.x].y *= -1 * collisionDamping;
+	}
+	else if (positionBuffer[id.x].y < boundsMin.y)
+	{
+		positionBuffer[id.x].y = boundsMin.y;
+		velocityBuffer[id.x].y *= -1 * collisionDamping;
+	}
+}

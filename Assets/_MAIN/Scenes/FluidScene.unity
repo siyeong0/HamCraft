@@ -287,28 +287,37 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   simulation:
     simulationComputeShader: {fileID: 7200000, guid: 7ae9de3b7f40cee4a81e722f37dde795, type: 3}
-    numParcels: 4000
-    interactionRadius: 0.35
-    targetDensity: 60
-    pressureCoefficient: 150
-    nearPressureCoefficient: 50
-    viscosityStrength: 0.1
+    bitonicSortComputeShader: {fileID: 7200000, guid: 1ecda62cf30385444902425fc175e53d, type: 3}
+    interactionRadius: 0.25
+    targetDensity: 200
+    pressureStiffness: 150
+    nearPressureStiffness: 10
+    viscosityStrength: 0.075
+    collisionDamping: 0.95
     gravity: 9
-    subStepCout: 1
+    subStepCount: 2
     controlRadius: 3
     controlStregth: 35
-    solveKernel: 0
+    numParcels: 20000
+    spacing: 0.08
+    applyExternalForcesKernel: 0
+    updateSpatialEntriesKernel: 0
+    sortKernel: 0
+    updateSpatialOffsetsKernel: 0
+    updateDensitiesKernel: 0
+    applyPressureForcesKernel: 0
+    applyViscocityForcesKernel: 0
+    updatePositionsKernel: 0
     hostPositionBuffer: []
     hostVelocityBuffer: []
-    hostPredictedPositionBuffer: []
-    hostDensityBuffer: []
+    numEntries: 0
     halfSize: {x: 0, y: 0}
   rendering:
-    rid: 1434706066982043753
+    rid: 1434706119063240791
   references:
     version: 2
     RefIds:
-    - rid: 1434706066982043753
+    - rid: 1434706119063240791
       type: {class: FluidSpeedRenderer, ns: HamCraft, asm: Assembly-CSharp}
       data:
         material: {fileID: 2100000, guid: 4f10cce14d2721449ba4d7acc22ea476, type: 2}
