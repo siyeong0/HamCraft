@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Numerics;
 using System.Threading.Tasks;
+using Unity.Assertions;
 using Unity.Mathematics;
-using Unity.VisualScripting;
-using UnityEngine;
 
 namespace HamCraft
 {
@@ -12,8 +10,8 @@ namespace HamCraft
 	{
 		class Entry : IComparable<Entry>
 		{
-			public int Index;
 			public uint Key;
+			public int Index;
 
 			public int CompareTo(Entry other)
 			{
@@ -25,6 +23,7 @@ namespace HamCraft
 
 		float2[] points;
 		float radius;
+		int maxPoints;
 
 		(int, int)[] cellOffsets =
 			{
@@ -41,7 +40,14 @@ namespace HamCraft
 
 		public SpatialGrid(int maxPoints)
 		{
-			spatialLookup = new Entry[maxPoints];
+			this.maxPoints = maxPoints;
+
+			// init spatial look up table
+			int padded = getNextPow2(maxPoints); // length must be 2^n
+			spatialLookup = new Entry[padded];
+			for (int i = 0; i < padded; i++) spatialLookup[i] = new Entry() {Key = uint.MaxValue, Index = -1 };
+
+			// init start indices buffer
 			startIndices = new int[maxPoints];
 		}
 
@@ -103,11 +109,12 @@ namespace HamCraft
 			{
 				(int cellX, int cellY) = cvtPositionToCellCoord(points[i], radius);
 				uint cellKey = getKeyFromHash(hashCellPos(cellX, cellY));
-				spatialLookup[i] = new Entry() { Index = i, Key = cellKey };
+				spatialLookup[i] = new Entry() { Key = cellKey, Index = i };
 				startIndices[i] = int.MaxValue;
 			});
 
-			Array.Sort(spatialLookup);
+			// Array.Sort(spatialLookup);
+			BitonicSort.Sort(spatialLookup);
 
 			Parallel.For(0, points.Length, i =>
 			{
@@ -135,7 +142,15 @@ namespace HamCraft
 
 		uint getKeyFromHash(uint hash)
 		{
-			return hash % (uint)spatialLookup.Length;
+			return hash % (uint)maxPoints;
+		}
+
+		int getNextPow2(int n)
+		{
+			int power = 1;
+			while (power < n)
+				power *= 2;
+			return power;
 		}
 	}
 }

@@ -5,7 +5,7 @@ namespace HamCraft
 	public class FluidSpeedRenderer : IFluidRenderer
 	{
 		public float circleRadius = 0.05f;
-		public float maxSpeed = 4.0f;
+		public float maxSpeed = 10f;
 		public Gradient speedColorMap = new Gradient()
 		{
 			colorKeys = new GradientColorKey[] { new GradientColorKey(Color.blue, 0f), new GradientColorKey(new Color(0.32f, 1.0f, 0.57f), 0.5f), new GradientColorKey(Color.yellow, 0.65f), new GradientColorKey(Color.red, 1f) },

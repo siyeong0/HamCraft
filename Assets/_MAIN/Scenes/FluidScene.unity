@@ -313,7 +313,7 @@ MonoBehaviour:
       data:
         material: {fileID: 2100000, guid: 4f10cce14d2721449ba4d7acc22ea476, type: 2}
         circleRadius: 0.05
-        maxSpeed: 4
+        maxSpeed: 10
         speedColorMap:
           serializedVersion: 2
           key0: {r: 0, g: 0, b: 1, a: 1}
