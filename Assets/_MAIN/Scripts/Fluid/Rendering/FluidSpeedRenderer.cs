@@ -6,6 +6,7 @@ namespace HamCraft
 	{
 		public float circleRadius = 0.05f;
 		public float maxSpeed = 10f;
+		[Range(0,1)] public float transparency = 0.5f;
 		public Gradient speedColorMap = new Gradient()
 		{
 			colorKeys = new GradientColorKey[] { new GradientColorKey(Color.blue, 0f), new GradientColorKey(new Color(0.32f, 1.0f, 0.57f), 0.5f), new GradientColorKey(Color.yellow, 0.65f), new GradientColorKey(Color.red, 1f) },
@@ -44,6 +45,7 @@ namespace HamCraft
 
 			material.SetFloat("radius", circleRadius);
 			material.SetFloat("maxSpeed", maxSpeed);
+			material.SetFloat("opacity", 1f - transparency);
 
 			Graphics.DrawMeshInstancedIndirect(mesh, 0, material, new Bounds(Vector3.zero, Vector3.one * 1000f), argsBuffer);
 		}

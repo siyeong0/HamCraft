@@ -17,7 +17,6 @@
             StructuredBuffer<float2> positionBuffer;
             float radius;
             float4 color;
-
             struct appdata
             {
                 float4 vertex : POSITION;
@@ -45,7 +44,7 @@
             half4 frag(v2f input) : SV_Target
             {
                 float dist = length(input.uv);
-                float alpha = 1.0 - smoothstep(1.0, 1.0, dist);
+                float alpha = color - smoothstep(1.0, 1.0, dist);
                 return float4(color.rgb, alpha);
             }
             ENDCG

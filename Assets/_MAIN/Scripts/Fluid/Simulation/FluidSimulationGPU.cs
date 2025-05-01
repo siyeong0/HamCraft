@@ -1,6 +1,10 @@
-﻿using System.Runtime.InteropServices;
+﻿using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using Unity.Mathematics;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Experimental.AI;
+using UnityEngine.Tilemaps;
 
 namespace HamCraft
 {
@@ -9,7 +13,6 @@ namespace HamCraft
 	{
 		[Header("Comput Shader")]
 		public ComputeShader simulationComputeShader;
-		public ComputeShader bitonicSortComputeShader;
 
 		[Header("Simulation")]
 		public float interactionRadius = 0.25f;
@@ -17,9 +20,12 @@ namespace HamCraft
 		public float pressureStiffness = 150f;
 		public float nearPressureStiffness = 10f;
 		public float viscosityStrength = 0.075f;
-		[Range(0,1)]public float collisionDamping = 0.2f;
+		[Range(0,1)] public float collisionDamping = 0.2f;
 		public float gravity = 9f;
 		public uint subStepCount = 4;
+
+		[Header("Collision")]
+		public Tilemap tilemap;
 
 		[Header("Input Interaction")]
 		public float controlRadius = 3f;
@@ -28,6 +34,7 @@ namespace HamCraft
 		[Header("Initial Placement")]
 		public int numParcels = 20000;
 		public float spacing = 0.008f;
+		public Vector2 initOffset;
 
 		// compute shader kernels
 		[HideInInspector] public int applyExternalForcesKernel;
@@ -35,13 +42,20 @@ namespace HamCraft
 		[HideInInspector] public int sortKernel;
 		[HideInInspector] public int updateSpatialOffsetsKernel;
 		[HideInInspector] public int updateDensitiesKernel;
+		[HideInInspector] public int relaxPositionsKernel;
 		[HideInInspector] public int applyPressureForcesKernel;
 		[HideInInspector] public int applyViscocityForcesKernel;
 		[HideInInspector] public int updatePositionsKernel;
 
-		// parcel data buffer
+		// parcel data buffers
 		[HideInInspector] public float2[] hostPositionBuffer;
 		[HideInInspector] public float2[] hostVelocityBuffer;
+
+		// collider data buffers
+		[HideInInspector] public int maxPolygonPoints = 4096;
+		[HideInInspector] public int numPolygons;
+		[HideInInspector] public float2[] hostPolygonPointBuffer;
+		[HideInInspector] public uint[] hostPolygonOffsetBuffer;
 
 		// compute buffers
 		[HideInInspector] public ComputeBuffer devicePositionBuffer;
@@ -50,6 +64,8 @@ namespace HamCraft
 		[HideInInspector] public ComputeBuffer deviceDensityBuffer;
 		[HideInInspector] public ComputeBuffer deviceSpatialEntryBuffer;
 		[HideInInspector] public ComputeBuffer deviceSpatialOffsetBuffer;
+		[HideInInspector] public ComputeBuffer devicePolygonPointBuffer;
+		[HideInInspector] public ComputeBuffer devicePolygonOffsetBuffer;
 
 		// other values
 		[HideInInspector] public int numEntries;
@@ -66,6 +82,7 @@ namespace HamCraft
 			sortKernel = simulationComputeShader.FindKernel("Sort");
 			updateSpatialOffsetsKernel = simulationComputeShader.FindKernel("UpdateSpatialOffsets");
 			updateDensitiesKernel = simulationComputeShader.FindKernel("UpdateDensities");
+			relaxPositionsKernel = simulationComputeShader.FindKernel("RelaxPositions");
 			applyPressureForcesKernel = simulationComputeShader.FindKernel("ApplyPressureForces");
 			applyViscocityForcesKernel = simulationComputeShader.FindKernel("ApplyViscocityForces");
 			updatePositionsKernel = simulationComputeShader.FindKernel("UpdatePositions");
@@ -74,6 +91,9 @@ namespace HamCraft
 			hostPositionBuffer = new float2[numParcels];
 			hostVelocityBuffer = new float2[numParcels];
 
+			hostPolygonPointBuffer = new float2[maxPolygonPoints];
+			hostPolygonOffsetBuffer = new uint[maxPolygonPoints / 3];
+
 			// init device buffers
 			devicePositionBuffer = new ComputeBuffer(numParcels, Marshal.SizeOf<float2>());
 			devicePredictedPositionBuffer = new ComputeBuffer(numParcels, Marshal.SizeOf<float2>());
@@ -81,6 +101,8 @@ namespace HamCraft
 			deviceDensityBuffer = new ComputeBuffer(numParcels, Marshal.SizeOf<float2>());
 			deviceSpatialEntryBuffer = new ComputeBuffer(numEntries, Marshal.SizeOf<uint3>());
 			deviceSpatialOffsetBuffer = new ComputeBuffer(numEntries, Marshal.SizeOf<uint>());
+			devicePolygonPointBuffer = new ComputeBuffer(maxPolygonPoints, Marshal.SizeOf<float2>());
+			devicePolygonOffsetBuffer = new ComputeBuffer(maxPolygonPoints / 3, Marshal.SizeOf<uint>());
 
 			// set compute shader buffers
 			simulationComputeShader.SetBuffer(applyExternalForcesKernel, "positionBuffer", devicePositionBuffer);
@@ -101,6 +123,10 @@ namespace HamCraft
 			simulationComputeShader.SetBuffer(updateDensitiesKernel, "spatialEntryBuffer", deviceSpatialEntryBuffer);
 			simulationComputeShader.SetBuffer(updateDensitiesKernel, "spatialOffsetBuffer", deviceSpatialOffsetBuffer);
 
+			simulationComputeShader.SetBuffer(relaxPositionsKernel, "predictedPositionBuffer", devicePredictedPositionBuffer);
+			simulationComputeShader.SetBuffer(relaxPositionsKernel, "spatialEntryBuffer", deviceSpatialEntryBuffer);
+			simulationComputeShader.SetBuffer(relaxPositionsKernel, "spatialOffsetBuffer", deviceSpatialOffsetBuffer);
+			
 			simulationComputeShader.SetBuffer(applyPressureForcesKernel, "predictedPositionBuffer", devicePredictedPositionBuffer);
 			simulationComputeShader.SetBuffer(applyPressureForcesKernel, "velocityBuffer", deviceVelocityBuffer);
 			simulationComputeShader.SetBuffer(applyPressureForcesKernel, "densityBuffer", deviceDensityBuffer);
@@ -114,14 +140,16 @@ namespace HamCraft
 
 			simulationComputeShader.SetBuffer(updatePositionsKernel, "positionBuffer", devicePositionBuffer);
 			simulationComputeShader.SetBuffer(updatePositionsKernel, "velocityBuffer", deviceVelocityBuffer);
+			simulationComputeShader.SetBuffer(updatePositionsKernel, "polygonPointBuffer", devicePolygonPointBuffer);
+			simulationComputeShader.SetBuffer(updatePositionsKernel, "polygonOffsetBuffer", devicePolygonOffsetBuffer);
 
 			// init parcels
 			int numParcelsPerLine = Mathf.CeilToInt(Mathf.Sqrt(numParcels));
 			float basePos = -numParcelsPerLine / 2 * spacing;
 			for (int i = 0; i < numParcels; i++)
 			{
-				float x = i % numParcelsPerLine * spacing + basePos;
-				float y = i / numParcelsPerLine * spacing + basePos;
+				float x = i % numParcelsPerLine * spacing + basePos + initOffset.x;
+				float y = i / numParcelsPerLine * spacing + basePos + initOffset.y;
 				hostPositionBuffer[i] = new float2(x, y);
 				hostVelocityBuffer[i] = float2.zero;
 			}
@@ -145,8 +173,9 @@ namespace HamCraft
 
 		public void Step()
 		{
-			updateConstants();
+			updateColliderPolygons();
 
+			updateConstants();
 			for (int i = 0; i < subStepCount; ++i)
 			{
 				simulationStep();
@@ -169,6 +198,7 @@ namespace HamCraft
 			}
 			simulationComputeShader.Dispatch(updateSpatialOffsetsKernel, Mathf.CeilToInt(numParcels / 1024f), 1, 1);
 			simulationComputeShader.Dispatch(updateDensitiesKernel, Mathf.CeilToInt(numParcels / 1024f), 1, 1);
+			simulationComputeShader.Dispatch(relaxPositionsKernel, Mathf.CeilToInt(numParcels / 1024f), 1, 1);
 			simulationComputeShader.Dispatch(applyPressureForcesKernel, Mathf.CeilToInt(numParcels / 1024f), 1, 1);
 			simulationComputeShader.Dispatch(applyViscocityForcesKernel, Mathf.CeilToInt(numParcels / 1024f), 1, 1);
 			simulationComputeShader.Dispatch(updatePositionsKernel, Mathf.CeilToInt(numParcels / 1024f), 1, 1);
@@ -182,6 +212,8 @@ namespace HamCraft
 			deviceDensityBuffer?.Release();
 			deviceSpatialEntryBuffer?.Release();
 			deviceSpatialOffsetBuffer?.Release();
+			devicePolygonPointBuffer?.Release();
+			devicePolygonOffsetBuffer?.Release();
 		}
 
 		void updateConstants()
@@ -209,6 +241,55 @@ namespace HamCraft
 
 			simulationComputeShader.SetInt("numParcels", numParcels);
 			simulationComputeShader.SetInt("numEntries", numEntries);
+		}
+
+		void updateColliderPolygons()
+		{
+			numPolygons = 0;
+			int pointCount = 0;
+			int polygonCount = 0;
+
+			// tilemap
+			var composite = tilemap.GetComponent<CompositeCollider2D>();
+			int pathCount = composite.pathCount;
+			numPolygons += pathCount;
+
+			for (int i = 0; i < pathCount; i++)
+			{
+				int numPoints = composite.GetPathPointCount(i);
+				Vector2[] points = new Vector2[numPoints];
+				composite.GetPath(i, points);
+				
+				for (int j = 0; j < numPoints; j++)
+				{
+					hostPolygonPointBuffer[pointCount++] = points[j];
+				}
+				hostPolygonOffsetBuffer[polygonCount++] = (uint)numPoints;
+			}
+
+			// update compute buffers
+			simulationComputeShader.SetInt("numPolygons", numPolygons);
+			devicePolygonPointBuffer.SetData(hostPolygonPointBuffer);
+			devicePolygonOffsetBuffer.SetData(hostPolygonOffsetBuffer);
+		}
+
+		public void DrawGizmoPolygons()
+		{
+			int start = 0;
+			for (int i =0; i < numPolygons; ++i)
+			{
+				int end = start + (int)hostPolygonOffsetBuffer[i];
+
+				for (int a = start, b = end - 1; a < end; b = a++)
+				{
+					float2 pa = hostPolygonPointBuffer[a];
+					float2 pb = hostPolygonPointBuffer[b];
+					Gizmos.DrawLine(
+						new Vector3(pa.x, pa.y, 0f),
+						new Vector3(pb.x, pb.y, 0f));
+				}
+				start = end;
+			}
 		}
 
 		(Vector2, float) getMouseInput()

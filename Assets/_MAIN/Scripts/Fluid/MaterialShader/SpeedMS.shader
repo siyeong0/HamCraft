@@ -19,6 +19,7 @@ Shader "Custom/SpeedMS"
             float radius;
             float maxSpeed;
             Texture2D speedColorMap;
+            float opacity;
             SamplerState linear_clamp_sampler
             {
                 Filter = MIN_MAG_MIP_LINEAR;
@@ -61,7 +62,7 @@ Shader "Custom/SpeedMS"
             half4 frag(v2f input) : SV_Target
             {
                 float dist = length(input.uv);
-                float alpha = 1.0 - smoothstep(1.0, 1.0, dist);
+                float alpha = opacity * step(dist, 1.0);
                 float3 speedColor = speedColorMap.Sample(linear_clamp_sampler, input.colorUV);
                 return float4(speedColor, alpha);
             }

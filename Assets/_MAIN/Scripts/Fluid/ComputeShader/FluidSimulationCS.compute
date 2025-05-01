@@ -6,6 +6,7 @@
 #pragma kernel UpdateSpatialOffsets
 #pragma kernel Sort
 #pragma kernel UpdateDensities
+#pragma kernel RelaxPositions
 #pragma kernel ApplyPressureForces
 #pragma kernel ApplyViscocityForces
 #pragma kernel UpdatePositions;
@@ -35,6 +36,10 @@ RWStructuredBuffer<float2> densityBuffer;
 uint numEntries;
 RWStructuredBuffer<uint3> spatialEntryBuffer; // (index, hash, key)
 RWStructuredBuffer<uint> spatialOffsetBuffer;
+
+uint numPolygons;
+RWStructuredBuffer<float2> polygonPointBuffer;
+RWStructuredBuffer<uint> polygonOffsetBuffer;
 
 float calcPressureFormDensity(float density)
 {
@@ -173,6 +178,54 @@ void UpdateDensities(uint3 id : SV_DispatchThreadID)
 }
 
 [numthreads(1024, 1, 1)]
+void RelaxPositions(uint3 id : SV_DispatchThreadID)
+{
+	if (id.x >= numParcels)
+		return;
+
+	float relaxRadius = 0.1;
+	float sqrRelaxRadius = relaxRadius * relaxRadius;
+	float relaxStiffness = 0.001;
+	
+	float2 originPos = predictedPositionBuffer[id.x];
+	int2 originCell = getCellCoordFromPosition(originPos, interactionRadius);
+
+	uint hash = getHashFromCellPos(originCell);
+	uint key = getKeyFromHash(hash, numEntries);
+	uint currIndex = spatialOffsetBuffer[key];
+	
+	while (currIndex < numParcels)
+	{
+		uint3 indexData = spatialEntryBuffer[currIndex++];
+		if (indexData.z != key)
+			break;
+		if (indexData.y != hash)
+			continue;
+
+		uint neighborIndex = indexData.x;
+		if (neighborIndex == id.x)
+			continue;
+
+		float2 neighborPos = predictedPositionBuffer[neighborIndex];
+		float2 offset = originPos - neighborPos;
+		float distSqr = dot(offset, offset);
+		if (distSqr > sqrRelaxRadius)
+			continue;
+
+		float dist = sqrt(distSqr);
+		float q = dist / relaxRadius;
+
+		float pressure = (1.0 - q);
+		float2 direction = offset / dist;
+
+		float2 delta = 0.5 * pressure * direction * relaxStiffness;
+
+		predictedPositionBuffer[id.x] += delta;
+		predictedPositionBuffer[neighborIndex] -= delta;
+	}
+}
+
+[numthreads(1024, 1, 1)]
 void ApplyPressureForces(uint3 id : SV_DispatchThreadID)
 {
 	if (id.x >= numParcels)
@@ -294,6 +347,57 @@ void UpdatePositions(uint3 id : SV_DispatchThreadID)
 	positionBuffer[id.x] += velocityBuffer[id.x] * deltaTime;
 	
 	// handle collision
+	float2 p = positionBuffer[id.x];
+	float2 v = velocityBuffer[id.x];
+	
+	int start = 0;
+	for (int i = 0; i < (int) numPolygons; i++)
+	{
+		int end = start + polygonOffsetBuffer[i];
+
+		bool bInside = false;
+		for (int a = start, b = end - 1; a < end; b = a++)
+		{
+			float2 pa = polygonPointBuffer[a];
+			float2 pb = polygonPointBuffer[b];
+			if ((pa.y > p.y) != (pb.y > p.y))
+			{
+				float xCross = (pb.x - pa.x) * (p.y - pa.y) / (pb.y - pa.y + 1e-6) + pa.x;
+				if (p.x < xCross)
+					bInside = !bInside;
+			}
+		}
+		if (bInside)
+		{
+			float minDist = 1e10;
+			float2 closestNormal = float2(0.0, 1.0);
+
+			for (int i = start, j = end - 1; i < end; j = i++)
+			{
+				float2 a = polygonPointBuffer[i];
+				float2 b = polygonPointBuffer[j];
+				float2 ab = b - a;
+				float2 ap = p - a;
+				float t = saturate(dot(ap, ab) / dot(ab, ab));
+				float2 proj = a + ab * t;
+				float dist = length(p - proj);
+
+				if (dist < minDist)
+				{
+					minDist = dist;
+					float2 edge = normalize(b - a);
+					closestNormal = normalize(float2(-edge.y, edge.x));
+				}
+			}
+
+			velocityBuffer[id.x] = (v - 2.0 * dot(v, closestNormal) * closestNormal) * collisionDamping;
+			positionBuffer[id.x] += minDist * closestNormal;
+		}
+		
+		start = end;
+	}
+	
+	// bounds condition
 	float2 boundsMin = float2(bounds.x, bounds.y);
 	float2 boundsMax = float2(bounds.z, bounds.w);
 	if (positionBuffer[id.x].x > boundsMax.x)

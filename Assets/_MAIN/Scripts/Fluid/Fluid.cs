@@ -1,7 +1,4 @@
-using Unity.Entities.UniversalDelegates;
 using UnityEngine;
-using UnityEngine.Assertions;
-using UnityEngine.Rendering;
 
 namespace HamCraft
 {
@@ -41,6 +38,11 @@ namespace HamCraft
 		{
 			rendering?.CleanUp();
 			simulation?.CleanUp();
+		}
+
+		private void OnDrawGizmos()
+		{
+			simulation.DrawGizmoPolygons();
 		}
 	}
 }
