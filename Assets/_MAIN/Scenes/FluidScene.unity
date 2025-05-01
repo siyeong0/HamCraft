@@ -293,13 +293,13 @@ MonoBehaviour:
     pressureStiffness: 150
     nearPressureStiffness: 10
     viscosityStrength: 0.075
-    collisionDamping: 0.95
+    collisionDamping: 0.2
     gravity: 9
-    subStepCount: 2
+    subStepCount: 4
     controlRadius: 3
     controlStregth: 35
-    numParcels: 20000
-    spacing: 0.08
+    numParcels: 30000
+    spacing: 0.04
     applyExternalForcesKernel: 0
     updateSpatialEntriesKernel: 0
     sortKernel: 0

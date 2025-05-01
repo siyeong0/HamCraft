@@ -17,9 +17,9 @@ namespace HamCraft
 		public float pressureStiffness = 150f;
 		public float nearPressureStiffness = 10f;
 		public float viscosityStrength = 0.075f;
-		public float collisionDamping = 0.95f;
+		[Range(0,1)]public float collisionDamping = 0.2f;
 		public float gravity = 9f;
-		public int subStepCount = 4;
+		public uint subStepCount = 4;
 
 		[Header("Input Interaction")]
 		public float controlRadius = 3f;
