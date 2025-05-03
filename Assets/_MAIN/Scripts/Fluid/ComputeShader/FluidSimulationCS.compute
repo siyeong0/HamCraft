@@ -216,7 +216,7 @@ void RelaxPositions(uint3 id : SV_DispatchThreadID)
 		float q = dist / relaxRadius;
 
 		float pressure = (1.0 - q);
-		float2 direction = offset / dist;
+        float2 direction = offset / max(EPSILON, dist);
 
 		float2 delta = 0.5 * pressure * direction * relaxStiffness;
 
