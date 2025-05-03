@@ -1,4 +1,7 @@
-﻿static const int2 SPATIAL_OFFSETS[9] =
+﻿#ifndef SPATIAL_GRID_INCLUDE
+#define SPATIAL_GRID_INCLUDE
+
+static const int2 SPATIAL_OFFSETS[9] =
 {
 	int2(-1, 1),
 	int2(0, 1),
@@ -29,3 +32,5 @@ uint getKeyFromHash(uint hash, uint tableSize)
 {
 	return hash % tableSize;
 }
+
+#endif
