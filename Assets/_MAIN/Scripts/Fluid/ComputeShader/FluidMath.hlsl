@@ -1,5 +1,5 @@
-﻿#ifndef COMMON_INCLUDED
-#define COMMON_INCLUDED
+﻿#ifndef FLUID_MATH_INCLUDE
+#define FLUID_MATH_INCLUDE
 
 static const float EPSILON = 0.001f;
 static const float2 GRAVITY = float2(0.0, -9.8);
