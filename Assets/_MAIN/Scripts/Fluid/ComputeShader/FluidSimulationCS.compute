@@ -19,6 +19,8 @@ float targetDensity;
 float pressureStiffness;
 float nearPressureStiffness;
 float viscosityStrength;
+float relaxRadius;
+float relaxStiffness;
 float collisionDamping;
 float2 gravity;
 float4 bounds;
@@ -183,9 +185,7 @@ void RelaxPositions(uint3 id : SV_DispatchThreadID)
 	if (id.x >= numParcels)
 		return;
 
-	float relaxRadius = 0.1;
 	float sqrRelaxRadius = relaxRadius * relaxRadius;
-	float relaxStiffness = 0.001;
 	
 	float2 originPos = predictedPositionBuffer[id.x];
 	int2 originCell = getCellCoordFromPosition(originPos, interactionRadius);
@@ -216,7 +216,7 @@ void RelaxPositions(uint3 id : SV_DispatchThreadID)
 		float q = dist / relaxRadius;
 
 		float pressure = (1.0 - q);
-        float2 direction = offset / max(EPSILON, dist);
+		float2 direction = offset / max(EPSILON, dist);
 
 		float2 delta = 0.5 * pressure * direction * relaxStiffness;
 
@@ -349,53 +349,61 @@ void UpdatePositions(uint3 id : SV_DispatchThreadID)
 	// handle collision
 	float2 p = positionBuffer[id.x];
 	float2 v = velocityBuffer[id.x];
+
+	uint windingCount = 0;
+	float minDist = 1e10;
+	float2 closestNormal = float2(0.0, 1.0);
 	
 	int start = 0;
-	for (int i = 0; i < (int) numPolygons; i++)
+	for (int polygonIdx = 0; polygonIdx < (int) numPolygons; polygonIdx++)
 	{
-		int end = start + polygonOffsetBuffer[i];
+		int end = start + polygonOffsetBuffer[polygonIdx];
 
 		bool bInside = false;
-		for (int a = start, b = end - 1; a < end; b = a++)
+		for (int s = start, e = end - 1; s < end; e = s++)
 		{
-			float2 pa = polygonPointBuffer[a];
-			float2 pb = polygonPointBuffer[b];
-			if ((pa.y > p.y) != (pb.y > p.y))
+			float2 a = polygonPointBuffer[s];
+			float2 b = polygonPointBuffer[e];
+			
+			// update min dist and closest normal
+			float2 ab = b - a;
+			float2 ap = p - a;
+			float t = saturate(dot(ap, ab) / dot(ab, ab));
+			float2 proj = a + ab * t;
+			float dist = length(p - proj);
+
+			if (dist < minDist)
 			{
-				float xCross = (pb.x - pa.x) * (p.y - pa.y) / (pb.y - pa.y + 1e-6) + pa.x;
-				if (p.x < xCross)
-					bInside = !bInside;
+				minDist = dist;
+				float2 edge = normalize(b - a);
+				closestNormal = normalize(float2(-edge.y, edge.x));
 			}
-		}
-		if (bInside)
-		{
-			float minDist = 1e10;
-			float2 closestNormal = float2(0.0, 1.0);
-
-			for (int i = start, j = end - 1; i < end; j = i++)
+			
+			// update inside state
+			if ((a.y > p.y) != (b.y > p.y))
 			{
-				float2 a = polygonPointBuffer[i];
-				float2 b = polygonPointBuffer[j];
-				float2 ab = b - a;
-				float2 ap = p - a;
-				float t = saturate(dot(ap, ab) / dot(ab, ab));
-				float2 proj = a + ab * t;
-				float dist = length(p - proj);
-
-				if (dist < minDist)
+				float xCross = (b.x - a.x) * (p.y - a.y) / (b.y - a.y + 1e-6) + a.x;
+				if (p.x < xCross)
 				{
-					minDist = dist;
-					float2 edge = normalize(b - a);
-					closestNormal = normalize(float2(-edge.y, edge.x));
+					bInside = !bInside;
 				}
 			}
-
-			velocityBuffer[id.x] = (v - 2.0 * dot(v, closestNormal) * closestNormal) * collisionDamping;
-			positionBuffer[id.x] += minDist * closestNormal;
+		}
+		
+		if (bInside)
+		{
+			++windingCount;
 		}
 		
 		start = end;
 	}
+	
+	if (windingCount % 2 == 1)
+	{
+		velocityBuffer[id.x] = reflect(v, closestNormal) * collisionDamping;
+		positionBuffer[id.x] += minDist * closestNormal;
+	}
+		
 	
 	// bounds condition
 	float2 boundsMin = float2(bounds.x, bounds.y);

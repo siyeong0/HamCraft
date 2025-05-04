@@ -1,9 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 using Unity.Mathematics;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.Experimental.AI;
 using UnityEngine.Tilemaps;
 
 namespace HamCraft
@@ -20,6 +17,8 @@ namespace HamCraft
 		public float pressureStiffness = 150f;
 		public float nearPressureStiffness = 10f;
 		public float viscosityStrength = 0.075f;
+		public float relaxPositionRadius = 0.1f;
+		public float relaxPositionStiffness = 0.01f;
 		[Range(0,1)] public float collisionDamping = 0.2f;
 		public float gravity = 9f;
 		public uint subStepCount = 4;
@@ -229,7 +228,10 @@ namespace HamCraft
 			simulationComputeShader.SetFloat("targetDensity", targetDensity);
 			simulationComputeShader.SetFloat("pressureStiffness", pressureStiffness);
 			simulationComputeShader.SetFloat("nearPressureStiffness", nearPressureStiffness);
+			simulationComputeShader.SetFloat("relaxRadius", relaxPositionRadius);
+			simulationComputeShader.SetFloat("relaxStiffness", relaxPositionStiffness);
 			simulationComputeShader.SetFloat("viscosityStrength", viscosityStrength);
+
 			simulationComputeShader.SetFloat("collisionDamping", collisionDamping);
 			simulationComputeShader.SetVector("gravity", new Vector2(0, -gravity));
 			simulationComputeShader.SetVector("bounds", new Vector4(-halfSize.x, -halfSize.y, halfSize.x, halfSize.y));
