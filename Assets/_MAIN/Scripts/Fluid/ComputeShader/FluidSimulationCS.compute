@@ -218,10 +218,9 @@ void RelaxPositions(uint3 id : SV_DispatchThreadID)
 		float pressure = (1.0 - q);
 		float2 direction = offset / max(EPSILON, dist);
 
-		float2 delta = 0.5 * pressure * direction * relaxStiffness;
+		float2 delta = pressure * direction * relaxStiffness;
 
 		predictedPositionBuffer[id.x] += delta;
-		predictedPositionBuffer[neighborIndex] -= delta;
 	}
 }
 
@@ -344,6 +343,7 @@ void UpdatePositions(uint3 id : SV_DispatchThreadID)
 		return;
 	
 	// update positions
+	velocityBuffer[id.x] = min(velocityBuffer[id.x], 100.0);
 	positionBuffer[id.x] += velocityBuffer[id.x] * deltaTime;
 	
 	// handle collision
@@ -390,10 +390,7 @@ void UpdatePositions(uint3 id : SV_DispatchThreadID)
 			}
 		}
 		
-		if (bInside)
-		{
-			++windingCount;
-		}
+		windingCount += bInside ? 1 : 0;
 		
 		start = end;
 	}
