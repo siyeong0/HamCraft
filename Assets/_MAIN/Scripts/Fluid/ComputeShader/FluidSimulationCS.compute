@@ -343,7 +343,8 @@ void UpdatePositions(uint3 id : SV_DispatchThreadID)
 		return;
 	
 	// update positions
-	velocityBuffer[id.x] = min(velocityBuffer[id.x], 100.0);
+	float speed = length(velocityBuffer[id.x]);
+	velocityBuffer[id.x] *= min(100.0 / speed, 1.0);
 	positionBuffer[id.x] += velocityBuffer[id.x] * deltaTime;
 	
 	// handle collision

@@ -181,7 +181,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 8
+  orthographic size: 20
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -1770,8 +1770,8 @@ MonoBehaviour:
   simulation:
     simulationComputeShader: {fileID: 7200000, guid: 7ae9de3b7f40cee4a81e722f37dde795, type: 3}
     interactionRadius: 0.25
-    targetDensity: 60
-    pressureStiffness: 200
+    targetDensity: 90
+    pressureStiffness: 150
     nearPressureStiffness: 20
     viscosityStrength: 0.075
     relaxPositionRadius: 0.1
@@ -1782,7 +1782,7 @@ MonoBehaviour:
     tilemap: {fileID: 107803903}
     controlRadius: 3
     controlStregth: 100
-    numParcels: 15000
+    numParcels: 100000
     spacing: 0.1
     initOffset: {x: 0, y: 0}
     applyExternalForcesKernel: 0
