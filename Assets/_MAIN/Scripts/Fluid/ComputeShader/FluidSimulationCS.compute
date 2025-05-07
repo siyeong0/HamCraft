@@ -42,6 +42,17 @@ RWStructuredBuffer<uint> spatialOffsetBuffer;
 uint numColliderPolygons;
 RWStructuredBuffer<float2> colliderPolygonPointBuffer;
 RWStructuredBuffer<uint> colliderPolygonOffsetBuffer;
+uint numRigidbodies;
+RWStructuredBuffer<uint> rigidbodyOffsetBuffer;
+struct Rigidbody
+{
+	float2 center;
+	float mass;
+	float2 velocity;
+	float angularVelocity;
+	float inertia;
+};
+RWStructuredBuffer<Rigidbody> rigidbodyBuffer;
 
 float calcPressureFormDensity(float density)
 {
@@ -350,56 +361,67 @@ void UpdatePositions(uint3 id : SV_DispatchThreadID)
 	// handle collision
 	float2 p = positionBuffer[id.x];
 	float2 v = velocityBuffer[id.x];
-
-	uint windingCount = 0;
-	float minDist = 1e10;
-	float2 closestNormal = float2(0.0, 1.0);
+	float m = 0.0001f;
 	
-	int start = 0;
-	for (int polygonIdx = 0; polygonIdx < (int)numColliderPolygons; polygonIdx++)
+	int polyStart = 0;
+	int rbpStart = 0;
+	for (int rbIdx = 0; rbIdx < (int) numRigidbodies; ++rbIdx)
 	{
-		int end = start + colliderPolygonOffsetBuffer[polygonIdx];
-
-		bool bInside = false;
-		for (int s = start, e = end - 1; s < end; e = s++)
+		int rbpEnd = rigidbodyOffsetBuffer[rbIdx];
+		
+		uint windingCount = 0;
+		float minDist = 1e10;
+		float2 closestProjDir = float2(0.0, 0.0);
+		float2 closestNormal = float2(0.0, 1.0);
+	
+		for (int rbpIdx = rbpStart; rbpIdx < rbpEnd; ++rbpIdx)
 		{
-			float2 a = colliderPolygonPointBuffer[s];
-			float2 b = colliderPolygonPointBuffer[e];
-			
-			// update min dist and closest normal
-			float2 ab = b - a;
-			float2 ap = p - a;
-			float t = saturate(dot(ap, ab) / dot(ab, ab));
-			float2 proj = a + ab * t;
-			float dist = length(p - proj);
+			int polyEnd = colliderPolygonOffsetBuffer[rbpIdx];
 
-			if (dist < minDist)
+			bool bInside = false;
+			for (int s = polyStart, e = polyEnd - 1; s < polyEnd; e = s++)
 			{
-				minDist = dist;
-				float2 edge = normalize(b - a);
-				closestNormal = normalize(float2(-edge.y, edge.x));
-			}
+				float2 a = colliderPolygonPointBuffer[s];
+				float2 b = colliderPolygonPointBuffer[e];
 			
-			// update inside state
-			if ((a.y > p.y) != (b.y > p.y))
-			{
-				float xCross = (b.x - a.x) * (p.y - a.y) / (b.y - a.y + 1e-6) + a.x;
-				if (p.x < xCross)
+				// update min dist and closest normal
+				float2 ab = b - a;
+				float2 ap = p - a;
+				float t = saturate(dot(ap, ab) / dot(ab, ab));
+				float2 proj = a + ab * t;
+				float2 projDir = proj - p;
+				float dist = length(projDir);
+
+				if (dist < minDist)
 				{
-					bInside = !bInside;
+					minDist = dist;
+					closestProjDir = projDir;
+					float2 edge = normalize(b - a);
+					closestNormal = normalize(float2(-edge.y, edge.x));
+				}
+			
+				// update inside state
+				if ((a.y > p.y) != (b.y > p.y))
+				{
+					float xCross = (b.x - a.x) * (p.y - a.y) / (b.y - a.y + 1e-6) + a.x;
+					if (p.x < xCross)
+					{
+						bInside = !bInside;
+					}
 				}
 			}
+			polyStart = polyEnd;
+			windingCount += bInside ? 1 : 0;
 		}
-		
-		windingCount += bInside ? 1 : 0;
-		
-		start = end;
-	}
-	
-	if (windingCount % 2 == 1)
-	{
-		velocityBuffer[id.x] = reflect(v, closestNormal) * collisionDamping;
-		positionBuffer[id.x] += minDist * closestNormal;
+			
+		// update particle state
+		if (windingCount % 2 == 1)
+		{
+			float2 contactPoint = positionBuffer[id.x] + minDist * closestProjDir;
+			positionBuffer[id.x] = contactPoint;
+			velocityBuffer[id.x] = reflect(v, closestNormal) * collisionDamping;
+		}
+		rbpStart = rbpEnd;
 	}
 		
 	

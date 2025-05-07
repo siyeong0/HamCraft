@@ -1,9 +1,9 @@
-﻿using System.Linq;
+﻿using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Tilemaps;
-using static UnityEngine.RuleTile.TilingRuleOutput;
 
 namespace HamCraft
 {
@@ -57,16 +57,34 @@ namespace HamCraft
 		int numColliderPolygons;
 		float2[] hostColliderPolygonPointBuffer;
 		uint[] hostColliderPolygonOffsetBuffer;
+		// rigidbody data buffers
+		const int maxRigidbodies = 512;
+		int numRigidbodies;
+		uint[] hostRigidBodyOffsetBuffer;
+		struct RigidbodyData
+		{
+			public float2 center;
+			public float mass;
+			public float2 velocity;
+			public float angularVelocity;
+			public float inertia;
+		}
+		RigidbodyData[] hostRigidbodyBuffer;
 
 		// compute buffers
 		[HideInInspector] public ComputeBuffer devicePositionBuffer;
 		[HideInInspector] public ComputeBuffer devicePredictedPositionBuffer;
 		[HideInInspector] public ComputeBuffer deviceVelocityBuffer;
 		[HideInInspector] public ComputeBuffer deviceDensityBuffer;
+
 		[HideInInspector] public ComputeBuffer deviceSpatialEntryBuffer;
 		[HideInInspector] public ComputeBuffer deviceSpatialOffsetBuffer;
+
 		[HideInInspector] public ComputeBuffer deviceColliderPolygonPointBuffer;
 		[HideInInspector] public ComputeBuffer deviceColliderPolygonOffsetBuffer;
+
+		[HideInInspector] public ComputeBuffer deviceRigidbodyOffsetBuffer;
+		[HideInInspector] public ComputeBuffer deviceRigidbodyBuffer;
 
 		// other values
 		int numEntries;
@@ -95,15 +113,23 @@ namespace HamCraft
 			hostColliderPolygonPointBuffer = new float2[maxColliderPolygonPoints];
 			hostColliderPolygonOffsetBuffer = new uint[maxColliderPolygonPoints / 3];
 
+			hostRigidBodyOffsetBuffer = new uint[maxRigidbodies];
+			hostRigidbodyBuffer = new RigidbodyData[maxRigidbodies];
+
 			// init device buffers
 			devicePositionBuffer = new ComputeBuffer(numParcels, Marshal.SizeOf<float2>());
 			devicePredictedPositionBuffer = new ComputeBuffer(numParcels, Marshal.SizeOf<float2>());
 			deviceVelocityBuffer = new ComputeBuffer(numParcels, Marshal.SizeOf<float2>());
 			deviceDensityBuffer = new ComputeBuffer(numParcels, Marshal.SizeOf<float2>());
+
 			deviceSpatialEntryBuffer = new ComputeBuffer(numEntries, Marshal.SizeOf<uint3>());
 			deviceSpatialOffsetBuffer = new ComputeBuffer(numEntries, Marshal.SizeOf<uint>());
+
 			deviceColliderPolygonPointBuffer = new ComputeBuffer(maxColliderPolygonPoints, Marshal.SizeOf<float2>());
 			deviceColliderPolygonOffsetBuffer = new ComputeBuffer(maxColliderPolygonPoints / 3, Marshal.SizeOf<uint>());
+
+			deviceRigidbodyOffsetBuffer = new ComputeBuffer(maxRigidbodies, Marshal.SizeOf<uint>());
+			deviceRigidbodyBuffer = new ComputeBuffer(maxRigidbodies, Marshal.SizeOf<RigidbodyData>());
 
 			// set compute shader buffers
 			simulationComputeShader.SetBuffer(applyExternalForcesKernel, "positionBuffer", devicePositionBuffer);
@@ -143,6 +169,9 @@ namespace HamCraft
 			simulationComputeShader.SetBuffer(updatePositionsKernel, "velocityBuffer", deviceVelocityBuffer);
 			simulationComputeShader.SetBuffer(updatePositionsKernel, "colliderPolygonPointBuffer", deviceColliderPolygonPointBuffer);
 			simulationComputeShader.SetBuffer(updatePositionsKernel, "colliderPolygonOffsetBuffer", deviceColliderPolygonOffsetBuffer);
+			simulationComputeShader.SetBuffer(updatePositionsKernel, "rigidbodyOffsetBuffer", deviceRigidbodyOffsetBuffer);
+			simulationComputeShader.SetBuffer(updatePositionsKernel, "rigidbodyBuffer", deviceRigidbodyBuffer);
+
 
 			// init parcels
 			int numParcelsPerLine = Mathf.CeilToInt(Mathf.Sqrt(numParcels));
@@ -208,6 +237,7 @@ namespace HamCraft
 
 		public void updateColliders()
 		{
+			numRigidbodies = 0;
 			numColliderPolygons = 0;
 			int pointCount = 0;
 			int polygonCount = 0;
@@ -215,8 +245,13 @@ namespace HamCraft
 			Rigidbody2D[] rigidbodies = Object.FindObjectsByType<Rigidbody2D>(FindObjectsSortMode.None);
 			foreach (var rigidbody in rigidbodies)
 			{
-				Collider2D[] colliders = rigidbody.GetComponentsInChildren<Collider2D>();
+				hostRigidbodyBuffer[numRigidbodies].center = rigidbody.centerOfMass + rigidbody.position;
+				hostRigidbodyBuffer[numRigidbodies].mass = rigidbody.mass;
+				hostRigidbodyBuffer[numRigidbodies].velocity = rigidbody.linearVelocity;
+				hostRigidbodyBuffer[numRigidbodies].angularVelocity = rigidbody.angularVelocity;
+				hostRigidbodyBuffer[numRigidbodies].inertia = rigidbody.inertia;
 
+				Collider2D[] colliders = rigidbody.GetComponentsInChildren<Collider2D>();
 				CompositeCollider2D composite = colliders
 					.OfType<CompositeCollider2D>()
 					.FirstOrDefault();
@@ -234,86 +269,92 @@ namespace HamCraft
 						{
 							hostColliderPolygonPointBuffer[pointCount++] = points[j];
 						}
-						hostColliderPolygonOffsetBuffer[polygonCount++] = (uint)numPoints;
+						hostColliderPolygonOffsetBuffer[polygonCount++] = (uint)pointCount;
 					}
-					continue;
 				}
-
-				foreach (var collider in colliders)
+				else
 				{
-					if (collider is PolygonCollider2D poly)
+					foreach (var collider in colliders)
 					{
-						numColliderPolygons += poly.pathCount;
-						for (int i = 0; i < poly.pathCount; i++)
+						if (collider is PolygonCollider2D poly)
 						{
-							Vector2[] path = poly.GetPath(i);
-
-							for (int j = 0; j < path.Length; j++)
+							numColliderPolygons += poly.pathCount;
+							for (int i = 0; i < poly.pathCount; i++)
 							{
-								hostColliderPolygonPointBuffer[pointCount++] = path[j];
+								Vector2[] path = poly.GetPath(i);
+
+								for (int j = 0; j < path.Length; j++)
+								{
+									hostColliderPolygonPointBuffer[pointCount++] = path[j];
+								}
+								hostColliderPolygonOffsetBuffer[polygonCount++] = (uint)pointCount;
 							}
-							hostColliderPolygonOffsetBuffer[polygonCount++] = (uint)path.Length;
 						}
-					}
-					else if (collider is BoxCollider2D box)
-					{
-						Vector2 size = box.size * 0.5f;
-						Vector2 offset = box.offset;
-						Vector2[] localPath = new Vector2[] {
+						else if (collider is BoxCollider2D box)
+						{
+							Vector2 size = box.size * 0.5f;
+							Vector2 offset = box.offset;
+							Vector2[] localPath = new Vector2[] {
 							offset + new Vector2( size.x, -size.y),
 							offset + new Vector2( size.x,  size.y),
 							offset + new Vector2(-size.x,  size.y),
 							offset + new Vector2(-size.x, -size.y),
 						};
-						Vector2[] path = localPath.Select(p => (Vector2)box.transform.TransformPoint(p)).ToArray();
+							Vector2[] path = localPath.Select(p => (Vector2)box.transform.TransformPoint(p)).ToArray();
 
-						++numColliderPolygons;
-						for (int j = 0; j < path.Length; j++)
-						{
-							hostColliderPolygonPointBuffer[pointCount++] = path[j];
+							++numColliderPolygons;
+							for (int j = 0; j < path.Length; j++)
+							{
+								hostColliderPolygonPointBuffer[pointCount++] = path[j];
+							}
+							hostColliderPolygonOffsetBuffer[polygonCount++] = (uint)pointCount;
 						}
-						hostColliderPolygonOffsetBuffer[polygonCount++] = (uint)path.Length;
-					}
-					else if (collider is CircleCollider2D circle)
-					{
-						int segments = 20;
-						Vector2[] localPath = new Vector2[segments];
-						for (int i = 0; i < segments; i++)
+						else if (collider is CircleCollider2D circle)
 						{
-							float angle = Mathf.Deg2Rad * 360f / segments * i;
-							localPath[i] = circle.offset + new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * circle.radius;
-						}
-						Vector2[] path = localPath.Select(p => (Vector2)circle.transform.TransformPoint(p)).ToArray();
+							int segments = 20;
+							Vector2[] localPath = new Vector2[segments];
+							for (int i = 0; i < segments; i++)
+							{
+								float angle = Mathf.Deg2Rad * 360f / segments * i;
+								localPath[i] = circle.offset + new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * circle.radius;
+							}
+							Vector2[] path = localPath.Select(p => (Vector2)circle.transform.TransformPoint(p)).ToArray();
 
-						++numColliderPolygons;
-						for (int j = 0; j < path.Length; j++)
-						{
-							hostColliderPolygonPointBuffer[pointCount++] = path[j];
+							++numColliderPolygons;
+							for (int j = 0; j < path.Length; j++)
+							{
+								hostColliderPolygonPointBuffer[pointCount++] = path[j];
+							}
+							hostColliderPolygonOffsetBuffer[polygonCount++] = (uint)pointCount;
 						}
-						hostColliderPolygonOffsetBuffer[polygonCount++] = (uint)path.Length;
-					}
-					else if (collider is EdgeCollider2D edge)
-					{
-						Vector2[] path = edge.points;
+						else if (collider is EdgeCollider2D edge)
+						{
+							Vector2[] path = edge.points;
 
-						++numColliderPolygons;
-						for (int j = 0; j < path.Length; j++)
-						{
-							hostColliderPolygonPointBuffer[pointCount++] = path[j];
+							++numColliderPolygons;
+							for (int j = 0; j < path.Length; j++)
+							{
+								hostColliderPolygonPointBuffer[pointCount++] = path[j];
+							}
+							hostColliderPolygonOffsetBuffer[polygonCount++] = (uint)pointCount;
 						}
-						hostColliderPolygonOffsetBuffer[polygonCount++] = (uint)path.Length;
-					}
-					else
-					{
-						Debug.Assert(false, "Invalide collider type");
+						else
+						{
+							Debug.Assert(false, "Invalide collider type");
+						}
 					}
 				}
+				hostRigidBodyOffsetBuffer[numRigidbodies++] = (uint)numColliderPolygons;
 			}
 
 			// update compute buffers
 			simulationComputeShader.SetInt("numColliderPolygons", numColliderPolygons);
 			deviceColliderPolygonPointBuffer.SetData(hostColliderPolygonPointBuffer);
 			deviceColliderPolygonOffsetBuffer.SetData(hostColliderPolygonOffsetBuffer);
+
+			simulationComputeShader.SetInt("numRigidbodies", numRigidbodies);
+			deviceRigidbodyOffsetBuffer.SetData(hostRigidBodyOffsetBuffer);
+			deviceRigidbodyBuffer.SetData(hostRigidbodyBuffer);
 		}
 
 		public void CleanUp()
@@ -322,10 +363,15 @@ namespace HamCraft
 			deviceVelocityBuffer?.Release();
 			devicePredictedPositionBuffer?.Release();
 			deviceDensityBuffer?.Release();
+
 			deviceSpatialEntryBuffer?.Release();
 			deviceSpatialOffsetBuffer?.Release();
+
 			deviceColliderPolygonPointBuffer?.Release();
 			deviceColliderPolygonOffsetBuffer?.Release();
+
+			deviceRigidbodyOffsetBuffer?.Release();
+			deviceRigidbodyBuffer?.Release();
 		}
 
 		void updateConstants()
@@ -392,7 +438,7 @@ namespace HamCraft
 			int start = 0;
 			for (int i = 0; i < numColliderPolygons; ++i)
 			{
-				int end = start + (int)hostColliderPolygonOffsetBuffer[i];
+				int end = (int)hostColliderPolygonOffsetBuffer[i];
 
 				for (int a = start, b = end - 1; a < end; b = a++)
 				{
