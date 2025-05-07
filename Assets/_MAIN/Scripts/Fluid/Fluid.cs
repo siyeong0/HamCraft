@@ -4,6 +4,9 @@ namespace HamCraft
 {
 	public class Fluid : MonoBehaviour
 	{
+		[SerializeField] GameObject obj;
+		[Space(20)]
+
 		[SerializeField] FluidSimulationGPU simulation;
 		[Space(10)]
 		[SerializeReference, SubclassPicker] IFluidRenderer rendering;
@@ -26,6 +29,10 @@ namespace HamCraft
 				rendering.CleanUp();
 				simulation.Initialize();
 				rendering.Initialize(simulation);
+			}
+			if (Input.GetKeyDown(KeyCode.Space))
+			{
+				obj.SetActive(true);
 			}
 		}
 

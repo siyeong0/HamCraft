@@ -39,9 +39,9 @@ uint numEntries;
 RWStructuredBuffer<uint3> spatialEntryBuffer; // (index, hash, key)
 RWStructuredBuffer<uint> spatialOffsetBuffer;
 
-uint numPolygons;
-RWStructuredBuffer<float2> polygonPointBuffer;
-RWStructuredBuffer<uint> polygonOffsetBuffer;
+uint numColliderPolygons;
+RWStructuredBuffer<float2> colliderPolygonPointBuffer;
+RWStructuredBuffer<uint> colliderPolygonOffsetBuffer;
 
 float calcPressureFormDensity(float density)
 {
@@ -356,15 +356,15 @@ void UpdatePositions(uint3 id : SV_DispatchThreadID)
 	float2 closestNormal = float2(0.0, 1.0);
 	
 	int start = 0;
-	for (int polygonIdx = 0; polygonIdx < (int) numPolygons; polygonIdx++)
+	for (int polygonIdx = 0; polygonIdx < (int)numColliderPolygons; polygonIdx++)
 	{
-		int end = start + polygonOffsetBuffer[polygonIdx];
+		int end = start + colliderPolygonOffsetBuffer[polygonIdx];
 
 		bool bInside = false;
 		for (int s = start, e = end - 1; s < end; e = s++)
 		{
-			float2 a = polygonPointBuffer[s];
-			float2 b = polygonPointBuffer[e];
+			float2 a = colliderPolygonPointBuffer[s];
+			float2 b = colliderPolygonPointBuffer[e];
 			
 			// update min dist and closest normal
 			float2 ab = b - a;

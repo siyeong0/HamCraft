@@ -1,8 +1,9 @@
-﻿using System.Runtime.InteropServices;
-using Unity.Assertions;
+﻿using System.Linq;
+using System.Runtime.InteropServices;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using static UnityEngine.RuleTile.TilingRuleOutput;
 
 namespace HamCraft
 {
@@ -20,7 +21,7 @@ namespace HamCraft
 		public float viscosityStrength = 0.075f;
 		public float relaxPositionRadius = 0.1f;
 		public float relaxPositionStiffness = 0.01f;
-		[Range(0,1)] public float collisionDamping = 0.2f;
+		[Range(0, 1)] public float collisionDamping = 0.2f;
 		public float gravity = 9f;
 		public uint subStepCount = 4;
 
@@ -52,10 +53,10 @@ namespace HamCraft
 		[HideInInspector] public float2[] hostVelocityBuffer;
 
 		// collider data buffers
-		[HideInInspector] public int maxPolygonPoints = 4096;
-		[HideInInspector] public int numPolygons;
-		[HideInInspector] public float2[] hostPolygonPointBuffer;
-		[HideInInspector] public uint[] hostPolygonOffsetBuffer;
+		const int maxColliderPolygonPoints = 4096;
+		int numColliderPolygons;
+		float2[] hostColliderPolygonPointBuffer;
+		uint[] hostColliderPolygonOffsetBuffer;
 
 		// compute buffers
 		[HideInInspector] public ComputeBuffer devicePositionBuffer;
@@ -64,12 +65,12 @@ namespace HamCraft
 		[HideInInspector] public ComputeBuffer deviceDensityBuffer;
 		[HideInInspector] public ComputeBuffer deviceSpatialEntryBuffer;
 		[HideInInspector] public ComputeBuffer deviceSpatialOffsetBuffer;
-		[HideInInspector] public ComputeBuffer devicePolygonPointBuffer;
-		[HideInInspector] public ComputeBuffer devicePolygonOffsetBuffer;
+		[HideInInspector] public ComputeBuffer deviceColliderPolygonPointBuffer;
+		[HideInInspector] public ComputeBuffer deviceColliderPolygonOffsetBuffer;
 
 		// other values
-		[HideInInspector] public int numEntries;
-		[HideInInspector] public Vector2 halfSize;
+		int numEntries;
+		Vector2 halfSize;
 
 		public void Initialize()
 		{
@@ -91,8 +92,8 @@ namespace HamCraft
 			hostPositionBuffer = new float2[numParcels];
 			hostVelocityBuffer = new float2[numParcels];
 
-			hostPolygonPointBuffer = new float2[maxPolygonPoints];
-			hostPolygonOffsetBuffer = new uint[maxPolygonPoints / 3];
+			hostColliderPolygonPointBuffer = new float2[maxColliderPolygonPoints];
+			hostColliderPolygonOffsetBuffer = new uint[maxColliderPolygonPoints / 3];
 
 			// init device buffers
 			devicePositionBuffer = new ComputeBuffer(numParcels, Marshal.SizeOf<float2>());
@@ -101,8 +102,8 @@ namespace HamCraft
 			deviceDensityBuffer = new ComputeBuffer(numParcels, Marshal.SizeOf<float2>());
 			deviceSpatialEntryBuffer = new ComputeBuffer(numEntries, Marshal.SizeOf<uint3>());
 			deviceSpatialOffsetBuffer = new ComputeBuffer(numEntries, Marshal.SizeOf<uint>());
-			devicePolygonPointBuffer = new ComputeBuffer(maxPolygonPoints, Marshal.SizeOf<float2>());
-			devicePolygonOffsetBuffer = new ComputeBuffer(maxPolygonPoints / 3, Marshal.SizeOf<uint>());
+			deviceColliderPolygonPointBuffer = new ComputeBuffer(maxColliderPolygonPoints, Marshal.SizeOf<float2>());
+			deviceColliderPolygonOffsetBuffer = new ComputeBuffer(maxColliderPolygonPoints / 3, Marshal.SizeOf<uint>());
 
 			// set compute shader buffers
 			simulationComputeShader.SetBuffer(applyExternalForcesKernel, "positionBuffer", devicePositionBuffer);
@@ -126,7 +127,7 @@ namespace HamCraft
 			simulationComputeShader.SetBuffer(relaxPositionsKernel, "predictedPositionBuffer", devicePredictedPositionBuffer);
 			simulationComputeShader.SetBuffer(relaxPositionsKernel, "spatialEntryBuffer", deviceSpatialEntryBuffer);
 			simulationComputeShader.SetBuffer(relaxPositionsKernel, "spatialOffsetBuffer", deviceSpatialOffsetBuffer);
-			
+
 			simulationComputeShader.SetBuffer(applyPressureForcesKernel, "predictedPositionBuffer", devicePredictedPositionBuffer);
 			simulationComputeShader.SetBuffer(applyPressureForcesKernel, "velocityBuffer", deviceVelocityBuffer);
 			simulationComputeShader.SetBuffer(applyPressureForcesKernel, "densityBuffer", deviceDensityBuffer);
@@ -140,8 +141,8 @@ namespace HamCraft
 
 			simulationComputeShader.SetBuffer(updatePositionsKernel, "positionBuffer", devicePositionBuffer);
 			simulationComputeShader.SetBuffer(updatePositionsKernel, "velocityBuffer", deviceVelocityBuffer);
-			simulationComputeShader.SetBuffer(updatePositionsKernel, "polygonPointBuffer", devicePolygonPointBuffer);
-			simulationComputeShader.SetBuffer(updatePositionsKernel, "polygonOffsetBuffer", devicePolygonOffsetBuffer);
+			simulationComputeShader.SetBuffer(updatePositionsKernel, "colliderPolygonPointBuffer", deviceColliderPolygonPointBuffer);
+			simulationComputeShader.SetBuffer(updatePositionsKernel, "colliderPolygonOffsetBuffer", deviceColliderPolygonOffsetBuffer);
 
 			// init parcels
 			int numParcelsPerLine = Mathf.CeilToInt(Mathf.Sqrt(numParcels));
@@ -173,7 +174,8 @@ namespace HamCraft
 
 		public void Step()
 		{
-			updateColliderPolygons();
+			//updateColliderPolygons();
+			updateColliders();
 
 			updateConstants();
 			for (int i = 0; i < subStepCount; ++i)
@@ -204,6 +206,116 @@ namespace HamCraft
 			simulationComputeShader.Dispatch(updatePositionsKernel, Mathf.CeilToInt(numParcels / 1024f), 1, 1);
 		}
 
+		public void updateColliders()
+		{
+			numColliderPolygons = 0;
+			int pointCount = 0;
+			int polygonCount = 0;
+
+			Rigidbody2D[] rigidbodies = Object.FindObjectsByType<Rigidbody2D>(FindObjectsSortMode.None);
+			foreach (var rigidbody in rigidbodies)
+			{
+				Collider2D[] colliders = rigidbody.GetComponentsInChildren<Collider2D>();
+
+				CompositeCollider2D composite = colliders
+					.OfType<CompositeCollider2D>()
+					.FirstOrDefault();
+				if (composite != null)
+				{
+					int pathCount = composite.pathCount;
+					numColliderPolygons += pathCount;
+					for (int i = 0; i < pathCount; i++)
+					{
+						int numPoints = composite.GetPathPointCount(i);
+						Vector2[] points = new Vector2[numPoints];
+						composite.GetPath(i, points);
+
+						for (int j = 0; j < numPoints; j++)
+						{
+							hostColliderPolygonPointBuffer[pointCount++] = points[j];
+						}
+						hostColliderPolygonOffsetBuffer[polygonCount++] = (uint)numPoints;
+					}
+					continue;
+				}
+
+				foreach (var collider in colliders)
+				{
+					if (collider is PolygonCollider2D poly)
+					{
+						numColliderPolygons += poly.pathCount;
+						for (int i = 0; i < poly.pathCount; i++)
+						{
+							Vector2[] path = poly.GetPath(i);
+
+							for (int j = 0; j < path.Length; j++)
+							{
+								hostColliderPolygonPointBuffer[pointCount++] = path[j];
+							}
+							hostColliderPolygonOffsetBuffer[polygonCount++] = (uint)path.Length;
+						}
+					}
+					else if (collider is BoxCollider2D box)
+					{
+						Vector2 size = box.size * 0.5f;
+						Vector2 offset = box.offset;
+						Vector2[] localPath = new Vector2[] {
+							offset + new Vector2( size.x, -size.y),
+							offset + new Vector2( size.x,  size.y),
+							offset + new Vector2(-size.x,  size.y),
+							offset + new Vector2(-size.x, -size.y),
+						};
+						Vector2[] path = localPath.Select(p => (Vector2)box.transform.TransformPoint(p)).ToArray();
+
+						++numColliderPolygons;
+						for (int j = 0; j < path.Length; j++)
+						{
+							hostColliderPolygonPointBuffer[pointCount++] = path[j];
+						}
+						hostColliderPolygonOffsetBuffer[polygonCount++] = (uint)path.Length;
+					}
+					else if (collider is CircleCollider2D circle)
+					{
+						int segments = 20;
+						Vector2[] localPath = new Vector2[segments];
+						for (int i = 0; i < segments; i++)
+						{
+							float angle = Mathf.Deg2Rad * 360f / segments * i;
+							localPath[i] = circle.offset + new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * circle.radius;
+						}
+						Vector2[] path = localPath.Select(p => (Vector2)circle.transform.TransformPoint(p)).ToArray();
+
+						++numColliderPolygons;
+						for (int j = 0; j < path.Length; j++)
+						{
+							hostColliderPolygonPointBuffer[pointCount++] = path[j];
+						}
+						hostColliderPolygonOffsetBuffer[polygonCount++] = (uint)path.Length;
+					}
+					else if (collider is EdgeCollider2D edge)
+					{
+						Vector2[] path = edge.points;
+
+						++numColliderPolygons;
+						for (int j = 0; j < path.Length; j++)
+						{
+							hostColliderPolygonPointBuffer[pointCount++] = path[j];
+						}
+						hostColliderPolygonOffsetBuffer[polygonCount++] = (uint)path.Length;
+					}
+					else
+					{
+						Debug.Assert(false, "Invalide collider type");
+					}
+				}
+			}
+
+			// update compute buffers
+			simulationComputeShader.SetInt("numColliderPolygons", numColliderPolygons);
+			deviceColliderPolygonPointBuffer.SetData(hostColliderPolygonPointBuffer);
+			deviceColliderPolygonOffsetBuffer.SetData(hostColliderPolygonOffsetBuffer);
+		}
+
 		public void CleanUp()
 		{
 			devicePositionBuffer?.Release();
@@ -212,8 +324,8 @@ namespace HamCraft
 			deviceDensityBuffer?.Release();
 			deviceSpatialEntryBuffer?.Release();
 			deviceSpatialOffsetBuffer?.Release();
-			devicePolygonPointBuffer?.Release();
-			devicePolygonOffsetBuffer?.Release();
+			deviceColliderPolygonPointBuffer?.Release();
+			deviceColliderPolygonOffsetBuffer?.Release();
 		}
 
 		void updateConstants()
@@ -248,45 +360,44 @@ namespace HamCraft
 
 		void updateColliderPolygons()
 		{
-			numPolygons = 0;
+			numColliderPolygons = 0;
 			int pointCount = 0;
 			int polygonCount = 0;
 
-			// tilemap
 			var composite = tilemap.GetComponent<CompositeCollider2D>();
 			int pathCount = composite.pathCount;
-			numPolygons += pathCount;
+			numColliderPolygons += pathCount;
 
 			for (int i = 0; i < pathCount; i++)
 			{
 				int numPoints = composite.GetPathPointCount(i);
 				Vector2[] points = new Vector2[numPoints];
 				composite.GetPath(i, points);
-				
+
 				for (int j = 0; j < numPoints; j++)
 				{
-					hostPolygonPointBuffer[pointCount++] = points[j];
+					hostColliderPolygonPointBuffer[pointCount++] = points[j];
 				}
-				hostPolygonOffsetBuffer[polygonCount++] = (uint)numPoints;
+				hostColliderPolygonOffsetBuffer[polygonCount++] = (uint)numPoints;
 			}
 
 			// update compute buffers
-			simulationComputeShader.SetInt("numPolygons", numPolygons);
-			devicePolygonPointBuffer.SetData(hostPolygonPointBuffer);
-			devicePolygonOffsetBuffer.SetData(hostPolygonOffsetBuffer);
+			simulationComputeShader.SetInt("numColliderPolygons", numColliderPolygons);
+			deviceColliderPolygonPointBuffer.SetData(hostColliderPolygonPointBuffer);
+			deviceColliderPolygonOffsetBuffer.SetData(hostColliderPolygonOffsetBuffer);
 		}
 
 		public void DrawGizmoPolygons()
 		{
 			int start = 0;
-			for (int i =0; i < numPolygons; ++i)
+			for (int i = 0; i < numColliderPolygons; ++i)
 			{
-				int end = start + (int)hostPolygonOffsetBuffer[i];
+				int end = start + (int)hostColliderPolygonOffsetBuffer[i];
 
 				for (int a = start, b = end - 1; a < end; b = a++)
 				{
-					float2 pa = hostPolygonPointBuffer[a];
-					float2 pb = hostPolygonPointBuffer[b];
+					float2 pa = hostColliderPolygonPointBuffer[a];
+					float2 pb = hostColliderPolygonPointBuffer[b];
 					Gizmos.DrawLine(
 						new Vector3(pa.x, pa.y, 0f),
 						new Vector3(pb.x, pb.y, 0f));
